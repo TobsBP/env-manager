@@ -48,6 +48,15 @@ export function useAuth() {
 			// createSessionAction redirects — code below won't run on success
 			return { success: true };
 		} catch (err) {
+			// Next.js redirect() throws internally — let it propagate
+			if (
+				err &&
+				typeof err === 'object' &&
+				'digest' in err &&
+				String((err as { digest: unknown }).digest).startsWith('NEXT_REDIRECT')
+			) {
+				throw err;
+			}
 			const msg = getFirebaseAuthErrorMessage(err);
 			setError(msg);
 			setIsLoading(false);
