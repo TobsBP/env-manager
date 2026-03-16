@@ -61,7 +61,7 @@ export function NewEnvironmentModal({ onClose, onCreate }: Props) {
 
 				<div className="flex gap-2">
 					<input
-						className="auth-input flex-1"
+						className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-zinc-100 placeholder-zinc-500 outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/15 transition disabled:opacity-50"
 						placeholder="Custom name…"
 						value={name}
 						onChange={(e) => setName(e.target.value)}
@@ -72,7 +72,8 @@ export function NewEnvironmentModal({ onClose, onCreate }: Props) {
 						type="button"
 						onClick={() => handleCreate(name)}
 						disabled={isLoading || !name.trim()}
-						className="btn-primary px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+						className="btn-primary shrink-0 px-4 py-2 text-sm disabled:opacity-50 disabled:cursor-not-allowed"
+						style={{ width: 'auto' }}
 					>
 						Add
 					</button>
