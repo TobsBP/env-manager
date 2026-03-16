@@ -10,9 +10,21 @@ interface Props {
 	envBName: string;
 }
 
-export function EnvDiff({ projectId, envAId, envAName, envBId, envBName }: Props) {
-	const { variables: varsA, isLoading: loadingA } = useVariables(projectId, envAId);
-	const { variables: varsB, isLoading: loadingB } = useVariables(projectId, envBId);
+export function EnvDiff({
+	projectId,
+	envAId,
+	envAName,
+	envBId,
+	envBName,
+}: Props) {
+	const { variables: varsA, isLoading: loadingA } = useVariables(
+		projectId,
+		envAId,
+	);
+	const { variables: varsB, isLoading: loadingB } = useVariables(
+		projectId,
+		envBId,
+	);
 
 	if (loadingA || loadingB) {
 		return (
@@ -48,7 +60,10 @@ export function EnvDiff({ projectId, envAId, envAName, envBId, envBName }: Props
 		);
 	}
 
-	const rows: { key: string; type: 'only-a' | 'only-b' | 'different' | 'same' }[] = [
+	const rows: {
+		key: string;
+		type: 'only-a' | 'only-b' | 'different' | 'same';
+	}[] = [
 		...onlyInA.map((k) => ({ key: k, type: 'only-a' as const })),
 		...onlyInB.map((k) => ({ key: k, type: 'only-b' as const })),
 		...different.map((k) => ({ key: k, type: 'different' as const })),
@@ -118,14 +133,21 @@ export function EnvDiff({ projectId, envAId, envAName, envBId, envBName }: Props
 											: 'text-emerald-300';
 
 							return (
-								<tr key={key} className={`border-b border-zinc-800/40 last:border-0 ${rowBg}`}>
-									<td className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] ${cellA}`}>
+								<tr
+									key={key}
+									className={`border-b border-zinc-800/40 last:border-0 ${rowBg}`}
+								>
+									<td
+										className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] ${cellA}`}
+									>
 										{valA ?? '—'}
 									</td>
 									<td className="px-4 py-3 text-center font-mono text-xs font-medium text-zinc-300">
 										{key}
 									</td>
-									<td className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] text-right ${cellB}`}>
+									<td
+										className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] text-right ${cellB}`}
+									>
 										{valB ?? '—'}
 									</td>
 								</tr>

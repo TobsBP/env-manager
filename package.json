@@ -36,6 +36,8 @@
 	"license": "ISC",
 	"type": "module",
 	"lint-staged": {
-		"**/*.{ts,tsx,js,jsx,json}": "npx @biomejs/biome check --write"
+		"*.{js,ts,jsx,tsx}": [
+			"npx @biomejs/biome check --write"
+		]
 	}
 }

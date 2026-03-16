@@ -16,7 +16,10 @@ export function useEnvironment(projectId: string, envId: string) {
 			ref,
 			(snapshot) => {
 				if (snapshot.exists()) {
-					setEnvironment({ id: snapshot.id, ...snapshot.data() } as Environment);
+					setEnvironment({
+						id: snapshot.id,
+						...snapshot.data(),
+					} as Environment);
 				} else {
 					setEnvironment(null);
 				}

@@ -1,8 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { use, useEffect, useRef, useState } from 'react';
 import { EnvDiff } from '@/components/projects/EnvDiff';
 import { useEnvironments } from '@/hooks/useEnvironments';
 import { useUser } from '@/hooks/useUser';
@@ -31,14 +31,22 @@ interface EnvPickerProps {
 	isLoading: boolean;
 }
 
-function EnvPicker({ label, value, onChange, environments, disabledId, isLoading }: EnvPickerProps) {
+function EnvPicker({
+	label,
+	value,
+	onChange,
+	environments,
+	disabledId,
+	isLoading,
+}: EnvPickerProps) {
 	const [open, setOpen] = useState(false);
 	const ref = useRef<HTMLDivElement>(null);
 	const selected = environments.find((e) => e.id === value);
 
 	useEffect(() => {
 		function handleClick(e: MouseEvent) {
-			if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+			if (ref.current && !ref.current.contains(e.target as Node))
+				setOpen(false);
 		}
 		document.addEventListener('mousedown', handleClick);
 		return () => document.removeEventListener('mousedown', handleClick);
@@ -57,8 +65,12 @@ function EnvPicker({ label, value, onChange, environments, disabledId, isLoading
 				<span className="flex items-center gap-2.5 min-w-0">
 					{selected ? (
 						<>
-							<span className={`w-2 h-2 rounded-full shrink-0 ${ENV_DOT[selected.name.toLowerCase()] ?? 'bg-zinc-400'}`} />
-							<span className="font-medium text-zinc-100 truncate">{selected.name}</span>
+							<span
+								className={`w-2 h-2 rounded-full shrink-0 ${ENV_DOT[selected.name.toLowerCase()] ?? 'bg-zinc-400'}`}
+							/>
+							<span className="font-medium text-zinc-100 truncate">
+								{selected.name}
+							</span>
 						</>
 					) : (
 						<span className="text-zinc-500">{label}</span>
@@ -94,7 +106,10 @@ function EnvPicker({ label, value, onChange, environments, disabledId, isLoading
 								key={env.id}
 								type="button"
 								disabled={isDisabled}
-								onClick={() => { onChange(env.id); setOpen(false); }}
+								onClick={() => {
+									onChange(env.id);
+									setOpen(false);
+								}}
 								className={`w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-left transition-colors
 									${isDisabled ? 'opacity-30 cursor-not-allowed' : 'hover:bg-white/5 cursor-pointer'}
 									${isSelected ? 'text-violet-300 bg-violet-500/10' : 'text-zinc-200'}`}
@@ -102,7 +117,18 @@ function EnvPicker({ label, value, onChange, environments, disabledId, isLoading
 								<span className={`w-2 h-2 rounded-full shrink-0 ${dot}`} />
 								{env.name}
 								{isSelected && (
-									<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="ml-auto text-violet-400" aria-hidden="true">
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2.5"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										className="ml-auto text-violet-400"
+										aria-hidden="true"
+									>
 										<polyline points="20 6 9 17 4 12" />
 									</svg>
 								)}
@@ -141,7 +167,9 @@ export default function DiffPage({ params }: Props) {
 						<span className="font-semibold tracking-tight">Env Manager</span>
 					</div>
 					<div className="flex items-center gap-4">
-						<span className="hidden sm:block text-sm text-zinc-500">{user?.email}</span>
+						<span className="hidden sm:block text-sm text-zinc-500">
+							{user?.email}
+						</span>
 						<form action={signOutAction}>
 							<button
 								type="submit"
@@ -156,16 +184,54 @@ export default function DiffPage({ params }: Props) {
 
 			<main className="relative mx-auto max-w-5xl px-6 py-12">
 				<div className="mb-6 flex items-center gap-1.5 text-sm text-zinc-600">
-					<Link href="/dashboard" className="hover:text-zinc-300 transition-colors">Projects</Link>
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
-					<Link href={`/projects/${projectId}`} className="hover:text-zinc-300 transition-colors">Environments</Link>
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
+					<Link
+						href="/dashboard"
+						className="hover:text-zinc-300 transition-colors"
+					>
+						Projects
+					</Link>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+					<Link
+						href={`/projects/${projectId}`}
+						className="hover:text-zinc-300 transition-colors"
+					>
+						Environments
+					</Link>
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
+						<path d="M9 18l6-6-6-6" />
+					</svg>
 					<span className="text-zinc-300">Compare</span>
 				</div>
 
 				<div className="mb-8">
-					<h1 className="text-3xl font-semibold tracking-tight mb-1">Compare Environments</h1>
-					<p className="text-zinc-500">Select two environments to see a variable diff.</p>
+					<h1 className="text-3xl font-semibold tracking-tight mb-1">
+						Compare Environments
+					</h1>
+					<p className="text-zinc-500">
+						Select two environments to see a variable diff.
+					</p>
 				</div>
 
 				<div className="flex items-center gap-3 mb-8">
@@ -179,7 +245,18 @@ export default function DiffPage({ params }: Props) {
 					/>
 
 					<div className="shrink-0 w-8 h-8 rounded-lg bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center">
-						<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-500" aria-hidden="true">
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							className="text-zinc-500"
+							aria-hidden="true"
+						>
 							<path d="M18 8l4 4-4 4" />
 							<path d="M6 16l-4-4 4-4" />
 							<line x1="2" y1="12" x2="22" y2="12" />
@@ -209,8 +286,12 @@ export default function DiffPage({ params }: Props) {
 						<div className="w-14 h-14 rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20 flex items-center justify-center text-2xl mx-auto mb-4">
 							⚡
 						</div>
-						<p className="text-base font-medium text-zinc-200 mb-1">Select two environments</p>
-						<p className="text-sm text-zinc-500">Choose environments A and B above to see the diff.</p>
+						<p className="text-base font-medium text-zinc-200 mb-1">
+							Select two environments
+						</p>
+						<p className="text-sm text-zinc-500">
+							Choose environments A and B above to see the diff.
+						</p>
 					</div>
 				)}
 			</main>

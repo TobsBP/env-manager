@@ -198,11 +198,14 @@ export async function updateEnvironmentEasypanelAction(
 	if (project.data()?.userId !== user.uid)
 		return { success: false, error: 'Unauthorized' };
 
-	await projectRef.collection('environments').doc(envId).update({
-		easypanelUrl: result.data.easypanelUrl ?? '',
-		easypanelToken: result.data.easypanelToken ?? '',
-		easypanelServiceName: result.data.easypanelServiceName ?? '',
-	});
+	await projectRef
+		.collection('environments')
+		.doc(envId)
+		.update({
+			easypanelUrl: result.data.easypanelUrl ?? '',
+			easypanelToken: result.data.easypanelToken ?? '',
+			easypanelServiceName: result.data.easypanelServiceName ?? '',
+		});
 
 	return { success: true };
 }

@@ -77,7 +77,11 @@ export function useEnvironments(projectId: string) {
 
 	const cloneEnvironment = useCallback(
 		async (sourceEnvId: string, newName: string): Promise<AuthResult> => {
-			const result = await cloneEnvironmentAction(projectId, sourceEnvId, newName);
+			const result = await cloneEnvironmentAction(
+				projectId,
+				sourceEnvId,
+				newName,
+			);
 			if (!result.success) {
 				setError(result.error);
 			}

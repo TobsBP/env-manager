@@ -19,8 +19,13 @@ export default function ProjectPage({ params }: Props) {
 	const { projectId } = use(params);
 	const { user } = useUser();
 	const { project } = useProject(projectId);
-	const { environments, isLoading, createEnvironment, deleteEnvironment, cloneEnvironment } =
-		useEnvironments(projectId);
+	const {
+		environments,
+		isLoading,
+		createEnvironment,
+		deleteEnvironment,
+		cloneEnvironment,
+	} = useEnvironments(projectId);
 	const [showModal, setShowModal] = useState(false);
 	const [cloneTarget, setCloneTarget] = useState<Environment | null>(null);
 
@@ -87,11 +92,15 @@ export default function ProjectPage({ params }: Props) {
 							<h1 className="text-3xl font-semibold tracking-tight">
 								{project ? (
 									<>
-										<span className="text-zinc-500">{project.emoji} {project.name}</span>
+										<span className="text-zinc-500">
+											{project.emoji} {project.name}
+										</span>
 										<span className="text-zinc-700 mx-2">/</span>
 										Environments
 									</>
-								) : 'Environments'}
+								) : (
+									'Environments'
+								)}
 							</h1>
 							{!isLoading && environments.length > 0 && (
 								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">

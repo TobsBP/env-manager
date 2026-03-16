@@ -52,7 +52,6 @@ export function CloneEnvironmentModal({ envName, onClose, onClone }: Props) {
 						onChange={(e) => setName(e.target.value)}
 						onKeyDown={(e) => e.key === 'Enter' && handleClone()}
 						disabled={isLoading}
-						// biome-ignore lint/a11y/noAutofocus: modal input should be focused on open
 						autoFocus
 					/>
 					<button

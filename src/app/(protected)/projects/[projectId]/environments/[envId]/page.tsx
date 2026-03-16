@@ -286,10 +286,7 @@ export default function EnvironmentPage({ params }: Props) {
 									/>
 								</div>
 								<div className="flex flex-col gap-1.5">
-									<label
-										className="text-xs text-zinc-500"
-										htmlFor="ep-service"
-									>
+									<label className="text-xs text-zinc-500" htmlFor="ep-service">
 										Service / Project Name
 									</label>
 									<input
