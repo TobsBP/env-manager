@@ -81,7 +81,11 @@ export function useProjects() {
 	);
 
 	const updateProject = useCallback(
-		async (projectId: string, name: string, emoji: string): Promise<AuthResult> => {
+		async (
+			projectId: string,
+			name: string,
+			emoji: string,
+		): Promise<AuthResult> => {
 			setProjects((prev) =>
 				prev.map((p) => (p.id === projectId ? { ...p, name, emoji } : p)),
 			);

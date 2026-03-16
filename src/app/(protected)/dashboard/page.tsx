@@ -36,7 +36,9 @@ export default function DashboardPage() {
 						<span className="font-semibold tracking-tight">Env Manager</span>
 					</div>
 					<div className="flex items-center gap-4">
-						<span className="hidden sm:block text-sm text-zinc-500">{user?.email}</span>
+						<span className="hidden sm:block text-sm text-zinc-500">
+							{user?.email}
+						</span>
 						<form action={signOutAction}>
 							<button
 								type="submit"
@@ -54,7 +56,9 @@ export default function DashboardPage() {
 				<div className="mb-8 flex items-start justify-between">
 					<div>
 						<div className="flex items-center gap-3 mb-1">
-							<h1 className="text-3xl font-semibold tracking-tight">Projects</h1>
+							<h1 className="text-3xl font-semibold tracking-tight">
+								Projects
+							</h1>
 							{!isLoading && projects.length > 0 && (
 								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
 									{projects.length}
@@ -109,7 +113,10 @@ export default function DashboardPage() {
 				{isLoading ? (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						{[1, 2, 3].map((n) => (
-							<div key={n} className="glass-card h-[72px] animate-pulse bg-white/[0.02]" />
+							<div
+								key={n}
+								className="glass-card h-[72px] animate-pulse bg-white/[0.02]"
+							/>
 						))}
 					</div>
 				) : projects.length === 0 ? (
@@ -117,7 +124,9 @@ export default function DashboardPage() {
 						<div className="w-14 h-14 rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20 flex items-center justify-center text-2xl mx-auto mb-4">
 							📁
 						</div>
-						<p className="text-base font-medium text-zinc-200 mb-1">No projects yet</p>
+						<p className="text-base font-medium text-zinc-200 mb-1">
+							No projects yet
+						</p>
 						<p className="text-sm text-zinc-500">
 							Click{' '}
 							<button

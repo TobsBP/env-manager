@@ -35,7 +35,9 @@ export default function ProjectPage({ params }: Props) {
 						<span className="font-semibold tracking-tight">Env Manager</span>
 					</div>
 					<div className="flex items-center gap-4">
-						<span className="hidden sm:block text-sm text-zinc-500">{user?.email}</span>
+						<span className="hidden sm:block text-sm text-zinc-500">
+							{user?.email}
+						</span>
 						<form action={signOutAction}>
 							<button
 								type="submit"
@@ -58,7 +60,17 @@ export default function ProjectPage({ params }: Props) {
 					>
 						Projects
 					</Link>
-					<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+					<svg
+						width="12"
+						height="12"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
 						<path d="M9 18l6-6-6-6" />
 					</svg>
 					<span className="text-zinc-300">Environments</span>
@@ -67,7 +79,9 @@ export default function ProjectPage({ params }: Props) {
 				<div className="mb-8 flex items-start justify-between">
 					<div>
 						<div className="flex items-center gap-3 mb-1">
-							<h1 className="text-3xl font-semibold tracking-tight">Environments</h1>
+							<h1 className="text-3xl font-semibold tracking-tight">
+								Environments
+							</h1>
 							{!isLoading && environments.length > 0 && (
 								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
 									{environments.length}
@@ -91,7 +105,10 @@ export default function ProjectPage({ params }: Props) {
 				{isLoading ? (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 						{[1, 2].map((n) => (
-							<div key={n} className="glass-card h-[72px] animate-pulse bg-white/[0.02]" />
+							<div
+								key={n}
+								className="glass-card h-[72px] animate-pulse bg-white/[0.02]"
+							/>
 						))}
 					</div>
 				) : environments.length === 0 ? (

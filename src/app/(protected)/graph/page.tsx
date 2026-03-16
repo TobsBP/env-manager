@@ -20,7 +20,18 @@ export default function GraphPage() {
 							</div>
 							<span className="font-semibold tracking-tight">Env Manager</span>
 						</div>
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-700" aria-hidden="true">
+						<svg
+							width="12"
+							height="12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							className="text-zinc-700"
+							aria-hidden="true"
+						>
 							<path d="M9 18l6-6-6-6" />
 						</svg>
 						<Link
@@ -29,7 +40,18 @@ export default function GraphPage() {
 						>
 							Projects
 						</Link>
-						<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-zinc-700" aria-hidden="true">
+						<svg
+							width="12"
+							height="12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							className="text-zinc-700"
+							aria-hidden="true"
+						>
 							<path d="M9 18l6-6-6-6" />
 						</svg>
 						<span className="text-sm text-zinc-200">Dependency Graph</span>
@@ -38,7 +60,9 @@ export default function GraphPage() {
 						<span className="hidden text-xs text-zinc-600 sm:block">
 							Hover an arrow to delete it
 						</span>
-						<span className="hidden sm:block text-sm text-zinc-500">{user?.email}</span>
+						<span className="hidden sm:block text-sm text-zinc-500">
+							{user?.email}
+						</span>
 						<form action={signOutAction}>
 							<button
 								type="submit"

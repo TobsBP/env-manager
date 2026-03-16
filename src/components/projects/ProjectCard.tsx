@@ -5,9 +5,30 @@ import { useState } from 'react';
 import type { Project } from '@/types/project';
 
 const EMOJI_OPTIONS = [
-	'📁', '🚀', '🌐', '🔧', '💻', '📱', '🎯', '⚡',
-	'🔌', '🗄️', '🎨', '📊', '🔐', '🛠️', '📦', '🧪',
-	'🌍', '🔑', '🤖', '🧩', '🛡️', '🔭', '🎮', '🏗️',
+	'📁',
+	'🚀',
+	'🌐',
+	'🔧',
+	'💻',
+	'📱',
+	'🎯',
+	'⚡',
+	'🔌',
+	'🗄️',
+	'🎨',
+	'📊',
+	'🔐',
+	'🛠️',
+	'📦',
+	'🧪',
+	'🌍',
+	'🔑',
+	'🤖',
+	'🧩',
+	'🛡️',
+	'🔭',
+	'🎮',
+	'🏗️',
 ];
 
 interface Props {
@@ -120,7 +141,10 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 							<button
 								key={e}
 								type="button"
-								onClick={() => { setEmoji(e); setShowPicker(false); }}
+								onClick={() => {
+									setEmoji(e);
+									setShowPicker(false);
+								}}
 								className={`flex h-9 w-9 items-center justify-center rounded-lg text-lg transition-all ${
 									emoji === e
 										? 'bg-violet-500/30 ring-1 ring-violet-500'
@@ -149,7 +173,9 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 					<p className="font-medium truncate group-hover:text-violet-300 transition-colors">
 						{project.name}
 					</p>
-					<p className="text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5">Open project</p>
+					<p className="text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5">
+						Open project
+					</p>
 				</div>
 			</Link>
 			<div className="flex items-center gap-0.5 shrink-0">
@@ -160,7 +186,17 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 					aria-label="Rename project"
 					title="Rename"
 				>
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+					<svg
+						width="13"
+						height="13"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
 						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
 						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
 					</svg>
@@ -172,7 +208,17 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 					aria-label="Delete project"
 					title="Delete"
 				>
-					<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+					<svg
+						width="13"
+						height="13"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+						aria-hidden="true"
+					>
 						<polyline points="3 6 5 6 21 6" />
 						<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
 						<path d="M10 11v6M14 11v6" />
@@ -185,7 +231,16 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 					aria-hidden="true"
 					tabIndex={-1}
 				>
-					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+					<svg
+						width="14"
+						height="14"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						strokeWidth="2"
+						strokeLinecap="round"
+						strokeLinejoin="round"
+					>
 						<path d="M9 18l6-6-6-6" />
 					</svg>
 				</Link>
