@@ -13,6 +13,7 @@ export const updateProjectSchema = z.object({
 		.string()
 		.min(1, 'Project name is required')
 		.max(50, 'Project name too long'),
+	emoji: z.string().default('📁'),
 });
 
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;

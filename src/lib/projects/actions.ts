@@ -53,7 +53,7 @@ export async function updateProjectAction(
 	if (project.data()?.userId !== user.uid)
 		return { success: false, error: 'Unauthorized' };
 
-	await projectRef.update({ name: result.data.name });
+	await projectRef.update({ name: result.data.name, emoji: result.data.emoji });
 
 	return { success: true };
 }

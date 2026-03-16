@@ -4,11 +4,18 @@ import Link from 'next/link';
 import { useState } from 'react';
 import type { Project } from '@/types/project';
 
+const EMOJI_OPTIONS = [
+	'📁', '🚀', '🌐', '🔧', '💻', '📱', '🎯', '⚡',
+	'🔌', '🗄️', '🎨', '📊', '🔐', '🛠️', '📦', '🧪',
+	'🌍', '🔑', '🤖', '🧩', '🛡️', '🔭', '🎮', '🏗️',
+];
+
 interface Props {
 	project: Project;
 	onUpdate: (
 		id: string,
 		name: string,
+		emoji: string,
 	) => Promise<{ success: boolean; error?: string }>;
 	onDelete: (id: string) => void;
 }
@@ -16,32 +23,42 @@ interface Props {
 export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(project.name);
+	const [emoji, setEmoji] = useState(project.emoji ?? '📁');
+	const [showPicker, setShowPicker] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
 	function startEdit(e: React.MouseEvent) {
 		e.preventDefault();
 		setName(project.name);
+		setEmoji(project.emoji ?? '📁');
+		setShowPicker(false);
 		setError(null);
 		setEditing(true);
 	}
 
 	function cancelEdit() {
 		setEditing(false);
+		setShowPicker(false);
 		setError(null);
 	}
 
 	async function handleSave() {
 		const trimmed = name.trim();
-		if (!trimmed || trimmed === project.name) {
+		if (!trimmed) {
+			cancelEdit();
+			return;
+		}
+		if (trimmed === project.name && emoji === project.emoji) {
 			cancelEdit();
 			return;
 		}
 		setIsSaving(true);
-		const result = await onUpdate(project.id, trimmed);
+		const result = await onUpdate(project.id, trimmed, emoji);
 		setIsSaving(false);
 		if (result.success) {
 			setEditing(false);
+			setShowPicker(false);
 		} else {
 			setError(result.error ?? 'Failed to update');
 		}
@@ -54,17 +71,27 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 
 	if (editing) {
 		return (
-			<div className="glass-card flex flex-col gap-2 px-5 py-4 border-violet-500/20">
+			<div className="glass-card flex flex-col gap-3 px-5 py-4 border-violet-500/20">
 				{error && <p className="text-xs text-red-400">{error}</p>}
+
 				<div className="flex items-center gap-2">
-					<div className="w-10 h-10 rounded-xl bg-zinc-800/80 ring-1 ring-violet-500/30 flex items-center justify-center text-xl shrink-0">
-						{project.emoji ?? '📁'}
-					</div>
+					{/* Emoji toggle button */}
+					<button
+						type="button"
+						onClick={() => setShowPicker((v) => !v)}
+						disabled={isSaving}
+						title="Change icon"
+						className="w-10 h-10 rounded-xl bg-zinc-800/80 ring-1 ring-violet-500/40 flex items-center justify-center text-xl shrink-0 hover:ring-violet-500/70 hover:bg-zinc-700/80 transition-all"
+					>
+						{emoji}
+					</button>
+
 					<input
 						value={name}
 						onChange={(e) => setName(e.target.value)}
 						onKeyDown={handleKeyDown}
 						disabled={isSaving}
+						autoFocus
 						className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-zinc-100 outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/15 transition"
 					/>
 					<button
@@ -85,12 +112,32 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 						Cancel
 					</button>
 				</div>
+
+				{/* Emoji picker */}
+				{showPicker && (
+					<div className="grid grid-cols-8 gap-1 pt-1 border-t border-white/5">
+						{EMOJI_OPTIONS.map((e) => (
+							<button
+								key={e}
+								type="button"
+								onClick={() => { setEmoji(e); setShowPicker(false); }}
+								className={`flex h-9 w-9 items-center justify-center rounded-lg text-lg transition-all ${
+									emoji === e
+										? 'bg-violet-500/30 ring-1 ring-violet-500'
+										: 'hover:bg-zinc-700/60'
+								}`}
+							>
+								{e}
+							</button>
+						))}
+					</div>
+				)}
 			</div>
 		);
 	}
 
 	return (
-		<div className="glass-card flex items-center justify-between px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
+		<div className="glass-card flex items-center gap-2 px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
 			<Link
 				href={`/projects/${project.id}`}
 				className="flex items-center gap-4 flex-1 min-w-0"
@@ -104,22 +151,8 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 					</p>
 					<p className="text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5">Open project</p>
 				</div>
-				<svg
-					width="14"
-					height="14"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="currentColor"
-					strokeWidth="2"
-					strokeLinecap="round"
-					strokeLinejoin="round"
-					className="text-zinc-700 group-hover:text-violet-400 transition-all shrink-0 mr-2 group-hover:translate-x-0.5"
-					aria-hidden="true"
-				>
-					<path d="M9 18l6-6-6-6" />
-				</svg>
 			</Link>
-			<div className="flex items-center gap-0.5 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+			<div className="flex items-center gap-0.5 shrink-0">
 				<button
 					type="button"
 					onClick={startEdit}
@@ -146,6 +179,16 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 						<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
 					</svg>
 				</button>
+				<Link
+					href={`/projects/${project.id}`}
+					className="p-2 text-zinc-700 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all"
+					aria-hidden="true"
+					tabIndex={-1}
+				>
+					<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+						<path d="M9 18l6-6-6-6" />
+					</svg>
+				</Link>
 			</div>
 		</div>
 	);
