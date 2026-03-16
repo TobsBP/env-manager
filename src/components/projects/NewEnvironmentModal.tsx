@@ -84,7 +84,7 @@ export function NewEnvironmentModal({ onClose, onCreate }: Props) {
 				<button
 					type="button"
 					onClick={onClose}
-					className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
+					className="mt-4 text-sm text-zinc-500 hover:text-zinc-300 transition-colors cursor-pointer"
 				>
 					Cancel
 				</button>
