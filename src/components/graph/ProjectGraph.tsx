@@ -1,7 +1,6 @@
 'use client';
 
 import {
-	applyNodeChanges,
 	Background,
 	BackgroundVariant,
 	Controls,
@@ -75,20 +74,21 @@ export function ProjectGraph() {
 
 	const handleNodesChange = useCallback(
 		(changes: Parameters<typeof onNodesChange>[0]) => {
-			const next = applyNodeChanges(changes, nodes);
-			const hasDragEnd = changes.some(
-				(c) => c.type === 'position' && !('dragging' in c && c.dragging),
+			const dragEndChanges = changes.filter(
+				(c) => c.type === 'position' && 'dragging' in c && c.dragging === false,
 			);
-			if (hasDragEnd) {
+			if (dragEndChanges.length > 0) {
 				const positions = loadPositions();
-				for (const node of next) {
-					positions[node.id] = node.position;
+				for (const c of dragEndChanges) {
+					if (c.type === 'position' && c.position) {
+						positions[c.id] = c.position;
+					}
 				}
 				savePositions(positions);
 			}
 			onNodesChange(changes);
 		},
-		[nodes, onNodesChange],
+		[onNodesChange],
 	);
 
 	const handleDelete = useCallback(
@@ -209,6 +209,7 @@ export function ProjectGraph() {
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				fitView={false}
+				proOptions={{ hideAttribution: true }}
 				className="bg-zinc-950"
 			>
 				<Background
@@ -217,7 +218,7 @@ export function ProjectGraph() {
 					gap={20}
 					size={1}
 				/>
-				<Controls className="[&>button]:bg-zinc-800 [&>button]:border-zinc-700 [&>button]:text-zinc-300 [&>button:hover]:bg-zinc-700" />
+				<Controls className="[&>button]:bg-zinc-800! [&>button]:border-zinc-700! [&>button]:text-zinc-300! [&>button:hover]:bg-zinc-700! [&>button>svg]:fill-zinc-300! [&>button>svg]:stroke-zinc-300!" />
 				<MiniMap
 					nodeColor="#8b5cf6"
 					maskColor="rgba(9,9,11,0.8)"
