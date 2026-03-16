@@ -6,6 +6,7 @@ import { CloneEnvironmentModal } from '@/components/projects/CloneEnvironmentMod
 import { EnvironmentCard } from '@/components/projects/EnvironmentCard';
 import { NewEnvironmentModal } from '@/components/projects/NewEnvironmentModal';
 import { useEnvironments } from '@/hooks/useEnvironments';
+import { useProject } from '@/hooks/useProject';
 import { useUser } from '@/hooks/useUser';
 import { signOutAction } from '@/lib/auth/actions';
 import type { Environment } from '@/types/project';
@@ -17,6 +18,7 @@ interface Props {
 export default function ProjectPage({ params }: Props) {
 	const { projectId } = use(params);
 	const { user } = useUser();
+	const { project } = useProject(projectId);
 	const { environments, isLoading, createEnvironment, deleteEnvironment, cloneEnvironment } =
 		useEnvironments(projectId);
 	const [showModal, setShowModal] = useState(false);
@@ -83,7 +85,13 @@ export default function ProjectPage({ params }: Props) {
 					<div>
 						<div className="flex items-center gap-3 mb-1">
 							<h1 className="text-3xl font-semibold tracking-tight">
-								Environments
+								{project ? (
+									<>
+										<span className="text-zinc-500">{project.emoji} {project.name}</span>
+										<span className="text-zinc-700 mx-2">/</span>
+										Environments
+									</>
+								) : 'Environments'}
 							</h1>
 							{!isLoading && environments.length > 0 && (
 								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
