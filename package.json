@@ -34,5 +34,8 @@
 	"keywords": [],
 	"author": "tobias.bp2004@gmail.com",
 	"license": "ISC",
-	"type": "module"
+	"type": "module",
+	"lint-staged": {
+		"**/*.{ts,tsx,js,jsx,json}": "npx @biomejs/biome check --write"
+	}
 }

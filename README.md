@@ -6,7 +6,10 @@ A secure, real-time environment variable management platform. Organize projects,
 
 - **Projects & Environments** — Create projects with multiple environments and manage variables per environment
 - **Variable Management** — Add, edit, delete key-value pairs; copy all variables as `.env` format with one click
+- **Clone Environment** — Duplicate any environment (including all its variables) into a new one with a single click
+- **Environment Diff** — Side-by-side comparison of two environments: see which variables are missing, different, or identical
 - **Dependency Graph** — Interactive visual graph of environment connections powered by XYFlow; drag nodes, create/delete edges, sort by connection density
+- **EasyPanel Integration** — Deploy environment variables directly to an EasyPanel service from the UI
 - **Secure Auth** — Firebase Authentication with server-side session cookies (HttpOnly, 5-day expiry)
 - **Real-Time Sync** — Firestore `onSnapshot` listeners keep all data live across sessions
 - **User Isolation** — All data scoped per user at the database level
@@ -22,6 +25,7 @@ A secure, real-time environment variable management platform. Organize projects,
 | Graph | XYFlow / @xyflow/react |
 | Validation | Zod 4 |
 | Linting | Biome 2 |
+| Git Hooks | Husky + lint-staged |
 
 ## Getting Started
 
@@ -78,17 +82,18 @@ src/
 │       ├── dashboard/        # Project list
 │       ├── graph/            # Dependency graph
 │       └── projects/[id]/
+│           ├── diff/         # Environment diff page
 │           └── environments/[id]/  # Variable management
 ├── components/
 │   ├── auth/
 │   ├── graph/
-│   ├── projects/
+│   ├── projects/            # EnvironmentCard, CloneEnvironmentModal, EnvDiff, …
 │   └── variables/
-├── hooks/                   # Firestore real-time hooks (useProjects, useVariables, …)
+├── hooks/                   # Firestore real-time hooks (useProjects, useProject, useVariables, …)
 ├── lib/
 │   ├── firebase/            # Client + Admin SDK setup
 │   ├── auth/actions.ts      # Server Actions: session create/destroy
-│   ├── projects/actions.ts  # Server Actions: project & environment CRUD
+│   ├── projects/actions.ts  # Server Actions: project & environment CRUD + clone
 │   ├── variables/actions.ts # Server Actions: variable CRUD
 │   └── connections/actions.ts
 ├── providers/
