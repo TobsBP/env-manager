@@ -105,7 +105,7 @@ export function AddVariableForm({ onCreate }: Props) {
 	return (
 		<div className="glass-card px-4 py-3 flex flex-col gap-3">
 			{/* Mode tabs */}
-			<div className="flex items-center gap-1 text-xs">
+			<div className="flex items-center gap-1 text-xs border-b border-white/5 pb-3">
 				{(['single', 'paste', 'upload'] as Mode[]).map((m) => (
 					<button
 						key={m}
@@ -114,10 +114,10 @@ export function AddVariableForm({ onCreate }: Props) {
 							setMode(m);
 							if (m === 'upload') fileRef.current?.click();
 						}}
-						className={`px-3 py-1 rounded-md transition-colors ${
+						className={`px-3 py-1.5 rounded-lg transition-all font-medium ${
 							mode === m
-								? 'bg-violet-500/20 text-violet-300'
-								: 'text-zinc-500 hover:text-zinc-300'
+								? 'bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30'
+								: 'text-zinc-500 hover:text-zinc-300 hover:bg-white/5'
 						}`}
 					>
 						{m === 'single' && 'Single'}
