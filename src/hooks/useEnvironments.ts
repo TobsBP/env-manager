@@ -4,6 +4,7 @@ import { collection, onSnapshot, query } from 'firebase/firestore';
 import { useCallback, useEffect, useState } from 'react';
 import { db } from '@/lib/firebase/firestore';
 import {
+	cloneEnvironmentAction,
 	createEnvironmentAction,
 	deleteEnvironmentAction,
 } from '@/lib/projects/actions';
@@ -74,11 +75,23 @@ export function useEnvironments(projectId: string) {
 		[projectId],
 	);
 
+	const cloneEnvironment = useCallback(
+		async (sourceEnvId: string, newName: string): Promise<AuthResult> => {
+			const result = await cloneEnvironmentAction(projectId, sourceEnvId, newName);
+			if (!result.success) {
+				setError(result.error);
+			}
+			return result;
+		},
+		[projectId],
+	);
+
 	return {
 		environments,
 		isLoading,
 		error,
 		createEnvironment,
 		deleteEnvironment,
+		cloneEnvironment,
 	};
 }
