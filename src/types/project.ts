@@ -40,4 +40,7 @@ export interface Environment {
 	id: string;
 	name: string;
 	createdAt: unknown;
+	easypanelUrl?: string;
+	easypanelToken?: string;
+	easypanelServiceName?: string;
 }

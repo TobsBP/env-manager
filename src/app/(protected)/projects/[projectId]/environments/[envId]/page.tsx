@@ -1,12 +1,17 @@
 'use client';
 
 import Link from 'next/link';
-import { use, useCallback, useState } from 'react';
+import { use, useCallback, useEffect, useState } from 'react';
 import { AddVariableForm } from '@/components/variables/AddVariableForm';
 import { VariableRow } from '@/components/variables/VariableRow';
+import { useEnvironment } from '@/hooks/useEnvironment';
 import { useUser } from '@/hooks/useUser';
 import { useVariables } from '@/hooks/useVariables';
 import { signOutAction } from '@/lib/auth/actions';
+import {
+	deployToEasypanelAction,
+	updateEnvironmentEasypanelAction,
+} from '@/lib/projects/actions';
 
 interface Props {
 	params: Promise<{ projectId: string; envId: string }>;
@@ -23,7 +28,54 @@ export default function EnvironmentPage({ params }: Props) {
 		updateVariable,
 		deleteVariable,
 	} = useVariables(projectId, envId);
+	const { environment } = useEnvironment(projectId, envId);
 	const [copied, setCopied] = useState(false);
+
+	// EasyPanel state
+	const [epOpen, setEpOpen] = useState(false);
+	const [epUrl, setEpUrl] = useState('');
+	const [epToken, setEpToken] = useState('');
+	const [epService, setEpService] = useState('');
+	const [epSaving, setEpSaving] = useState(false);
+	const [epSaveMsg, setEpSaveMsg] = useState<string | null>(null);
+	const [epDeploying, setEpDeploying] = useState(false);
+	const [epDeployResult, setEpDeployResult] = useState<{
+		ok: boolean;
+		msg: string;
+	} | null>(null);
+
+	useEffect(() => {
+		if (environment) {
+			setEpUrl(environment.easypanelUrl ?? '');
+			setEpToken(environment.easypanelToken ?? '');
+			setEpService(environment.easypanelServiceName ?? '');
+		}
+	}, [environment]);
+
+	const saveEpConfig = useCallback(async () => {
+		setEpSaving(true);
+		setEpSaveMsg(null);
+		const result = await updateEnvironmentEasypanelAction(projectId, envId, {
+			easypanelUrl: epUrl,
+			easypanelToken: epToken,
+			easypanelServiceName: epService,
+		});
+		setEpSaving(false);
+		setEpSaveMsg(result.success ? 'Saved!' : (result.error ?? 'Error'));
+		setTimeout(() => setEpSaveMsg(null), 3000);
+	}, [projectId, envId, epUrl, epToken, epService]);
+
+	const deploy = useCallback(async () => {
+		setEpDeploying(true);
+		setEpDeployResult(null);
+		const result = await deployToEasypanelAction(projectId, envId);
+		setEpDeploying(false);
+		setEpDeployResult({
+			ok: result.success,
+			msg: result.success ? 'Deployed!' : (result.error ?? 'Deploy failed'),
+		});
+		setTimeout(() => setEpDeployResult(null), 5000);
+	}, [projectId, envId]);
 
 	const copyAll = useCallback(async () => {
 		const text = variables.map((v) => `${v.key}=${v.value}`).join('\n');
@@ -165,6 +217,164 @@ export default function EnvironmentPage({ params }: Props) {
 								</>
 							)}
 						</button>
+					)}
+				</div>
+
+				{/* EasyPanel Integration */}
+				<div className="mb-6 rounded-xl border border-zinc-800/80 bg-zinc-900/40 overflow-hidden">
+					<button
+						type="button"
+						onClick={() => setEpOpen((v) => !v)}
+						className="flex w-full items-center justify-between px-5 py-4 text-left hover:bg-zinc-800/30 transition-colors"
+					>
+						<div className="flex items-center gap-3">
+							<div className="flex h-7 w-7 items-center justify-center rounded-lg bg-violet-500/15 ring-1 ring-violet-500/25 text-sm">
+								🚀
+							</div>
+							<span className="text-sm font-medium text-zinc-200">
+								EasyPanel Integration
+							</span>
+							{environment?.easypanelServiceName && (
+								<span className="px-2 py-0.5 rounded-full bg-emerald-500/15 border border-emerald-500/25 text-xs text-emerald-400">
+									{environment.easypanelServiceName}
+								</span>
+							)}
+						</div>
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+							aria-hidden="true"
+							className={`text-zinc-500 transition-transform ${epOpen ? 'rotate-180' : ''}`}
+						>
+							<path d="M6 9l6 6 6-6" />
+						</svg>
+					</button>
+
+					{epOpen && (
+						<div className="border-t border-zinc-800/80 px-5 py-5 flex flex-col gap-4">
+							<div className="grid gap-3 sm:grid-cols-3">
+								<div className="flex flex-col gap-1.5">
+									<label className="text-xs text-zinc-500" htmlFor="ep-url">
+										EasyPanel URL
+									</label>
+									<input
+										id="ep-url"
+										type="url"
+										value={epUrl}
+										onChange={(e) => setEpUrl(e.target.value)}
+										placeholder="https://panel.myserver.com"
+										className="rounded-lg border border-zinc-700/80 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
+									/>
+								</div>
+								<div className="flex flex-col gap-1.5">
+									<label className="text-xs text-zinc-500" htmlFor="ep-token">
+										API Token
+									</label>
+									<input
+										id="ep-token"
+										type="password"
+										value={epToken}
+										onChange={(e) => setEpToken(e.target.value)}
+										placeholder="••••••••"
+										className="rounded-lg border border-zinc-700/80 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
+									/>
+								</div>
+								<div className="flex flex-col gap-1.5">
+									<label
+										className="text-xs text-zinc-500"
+										htmlFor="ep-service"
+									>
+										Service / Project Name
+									</label>
+									<input
+										id="ep-service"
+										type="text"
+										value={epService}
+										onChange={(e) => setEpService(e.target.value)}
+										placeholder="my-service"
+										className="rounded-lg border border-zinc-700/80 bg-zinc-900/60 px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/30"
+									/>
+								</div>
+							</div>
+
+							<div className="flex items-center gap-3 flex-wrap">
+								<button
+									type="button"
+									onClick={saveEpConfig}
+									disabled={epSaving}
+									className="flex h-8 items-center gap-2 rounded-lg border border-zinc-700/80 px-4 text-xs text-zinc-300 transition-all hover:border-zinc-500 hover:text-zinc-100 hover:bg-zinc-800/50 disabled:opacity-50"
+								>
+									{epSaving ? 'Saving…' : 'Save config'}
+								</button>
+
+								<button
+									type="button"
+									onClick={deploy}
+									disabled={epDeploying}
+									className="flex h-8 items-center gap-2 rounded-lg bg-violet-600 px-4 text-xs font-medium text-white transition-all hover:bg-violet-500 disabled:opacity-50"
+								>
+									{epDeploying ? (
+										<>
+											<svg
+												className="animate-spin"
+												width="12"
+												height="12"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2.5"
+												aria-hidden="true"
+											>
+												<path d="M21 12a9 9 0 1 1-6.219-8.56" />
+											</svg>
+											Deploying…
+										</>
+									) : (
+										<>
+											<svg
+												width="12"
+												height="12"
+												viewBox="0 0 24 24"
+												fill="none"
+												stroke="currentColor"
+												strokeWidth="2"
+												strokeLinecap="round"
+												strokeLinejoin="round"
+												aria-hidden="true"
+											>
+												<path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+												<path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+												<path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+												<path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+											</svg>
+											Deploy
+										</>
+									)}
+								</button>
+
+								{epSaveMsg && (
+									<span
+										className={`text-xs ${epSaveMsg === 'Saved!' ? 'text-emerald-400' : 'text-red-400'}`}
+									>
+										{epSaveMsg}
+									</span>
+								)}
+
+								{epDeployResult && (
+									<span
+										className={`text-xs ${epDeployResult.ok ? 'text-emerald-400' : 'text-red-400'}`}
+									>
+										{epDeployResult.msg}
+									</span>
+								)}
+							</div>
+						</div>
 					)}
 				</div>
 

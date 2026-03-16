@@ -1,6 +1,7 @@
 'use server';
 
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { z } from 'zod';
 import { getAdminAuth, getSessionUser } from '@/lib/firebase/admin';
 import type { AuthResult } from '@/types/auth';
 import {
@@ -8,6 +9,12 @@ import {
 	createProjectSchema,
 	updateProjectSchema,
 } from '@/types/project';
+
+const easypanelConfigSchema = z.object({
+	easypanelUrl: z.url('Invalid URL').optional().or(z.literal('')),
+	easypanelToken: z.string().optional(),
+	easypanelServiceName: z.string().optional(),
+});
 
 function getAdminDb() {
 	// Ensure admin app is initialized via getAdminAuth, then get Firestore
@@ -121,6 +128,112 @@ export async function deleteEnvironmentAction(
 		return { success: false, error: 'Unauthorized' };
 
 	await projectRef.collection('environments').doc(envId).delete();
+
+	return { success: true };
+}
+
+export async function updateEnvironmentEasypanelAction(
+	projectId: string,
+	envId: string,
+	config: unknown,
+): Promise<AuthResult> {
+	const user = await getSessionUser();
+	if (!user) return { success: false, error: 'Not authenticated' };
+
+	const result = easypanelConfigSchema.safeParse(config);
+	if (!result.success)
+		return { success: false, error: result.error.issues[0].message };
+
+	const db = getAdminDb();
+	const projectRef = db.collection('projects').doc(projectId);
+	const project = await projectRef.get();
+
+	if (!project.exists) return { success: false, error: 'Project not found' };
+	if (project.data()?.userId !== user.uid)
+		return { success: false, error: 'Unauthorized' };
+
+	await projectRef.collection('environments').doc(envId).update({
+		easypanelUrl: result.data.easypanelUrl ?? '',
+		easypanelToken: result.data.easypanelToken ?? '',
+		easypanelServiceName: result.data.easypanelServiceName ?? '',
+	});
+
+	return { success: true };
+}
+
+export async function deployToEasypanelAction(
+	projectId: string,
+	envId: string,
+): Promise<AuthResult> {
+	const user = await getSessionUser();
+	if (!user) return { success: false, error: 'Not authenticated' };
+
+	const db = getAdminDb();
+	const projectRef = db.collection('projects').doc(projectId);
+	const project = await projectRef.get();
+
+	if (!project.exists) return { success: false, error: 'Project not found' };
+	if (project.data()?.userId !== user.uid)
+		return { success: false, error: 'Unauthorized' };
+
+	const envRef = projectRef.collection('environments').doc(envId);
+	const env = await envRef.get();
+	if (!env.exists) return { success: false, error: 'Environment not found' };
+
+	const envData = env.data();
+	const { easypanelUrl, easypanelToken, easypanelServiceName } = envData ?? {};
+
+	if (!easypanelUrl || !easypanelToken || !easypanelServiceName)
+		return { success: false, error: 'EasyPanel config incomplete' };
+
+	const variablesSnap = await envRef.collection('variables').get();
+	const content = variablesSnap.docs
+		.map((doc) => {
+			const d = doc.data();
+			return `${d.key}=${d.value}`;
+		})
+		.join('\n');
+
+	const headers = {
+		Authorization: `Bearer ${easypanelToken}`,
+		'Content-Type': 'application/json',
+	};
+
+	const setEnvRes = await fetch(
+		`${easypanelUrl}/api/trpc/services.setEnvContent`,
+		{
+			method: 'POST',
+			headers,
+			body: JSON.stringify({
+				json: {
+					projectName: easypanelServiceName,
+					serviceName: easypanelServiceName,
+					content,
+				},
+			}),
+		},
+	);
+
+	if (!setEnvRes.ok) {
+		const text = await setEnvRes.text();
+		return { success: false, error: `Failed to set env vars: ${text}` };
+	}
+
+	const deployRes = await fetch(`${easypanelUrl}/api/trpc/services.deploy`, {
+		method: 'POST',
+		headers,
+		body: JSON.stringify({
+			json: {
+				projectName: easypanelServiceName,
+				serviceName: easypanelServiceName,
+			},
+		}),
+	});
+
+	if (!deployRes.ok) {
+		const text = await deployRes.text();
+		return { success: false, error: `Failed to deploy: ${text}` };
+	}
 
 	return { success: true };
 }
