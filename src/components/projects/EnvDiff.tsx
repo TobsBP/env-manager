@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { useVariables } from '@/hooks/useVariables';
 
 interface Props {
@@ -10,6 +11,23 @@ interface Props {
 	envBName: string;
 }
 
+const PencilIcon = () => (
+	<svg
+		width="12"
+		height="12"
+		viewBox="0 0 24 24"
+		fill="none"
+		stroke="currentColor"
+		strokeWidth="2"
+		strokeLinecap="round"
+		strokeLinejoin="round"
+		aria-hidden="true"
+	>
+		<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+		<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+	</svg>
+);
+
 export function EnvDiff({
 	projectId,
 	envAId,
@@ -17,14 +35,23 @@ export function EnvDiff({
 	envBId,
 	envBName,
 }: Props) {
-	const { variables: varsA, isLoading: loadingA } = useVariables(
-		projectId,
-		envAId,
-	);
-	const { variables: varsB, isLoading: loadingB } = useVariables(
-		projectId,
-		envBId,
-	);
+	const {
+		variables: varsA,
+		isLoading: loadingA,
+		updateVariable: updateA,
+	} = useVariables(projectId, envAId);
+	const {
+		variables: varsB,
+		isLoading: loadingB,
+		updateVariable: updateB,
+	} = useVariables(projectId, envBId);
+
+	const [editingCell, setEditingCell] = useState<{
+		key: string;
+		side: 'a' | 'b';
+	} | null>(null);
+	const [editValue, setEditValue] = useState('');
+	const [isSaving, setIsSaving] = useState(false);
 
 	if (loadingA || loadingB) {
 		return (
@@ -34,8 +61,8 @@ export function EnvDiff({
 		);
 	}
 
-	const mapA = new Map(varsA.map((v) => [v.key, v.value]));
-	const mapB = new Map(varsB.map((v) => [v.key, v.value]));
+	const mapA = new Map(varsA.map((v) => [v.key, { id: v.id, value: v.value }]));
+	const mapB = new Map(varsB.map((v) => [v.key, { id: v.id, value: v.value }]));
 	const allKeys = Array.from(new Set([...mapA.keys(), ...mapB.keys()])).sort();
 
 	const onlyInA: string[] = [];
@@ -48,7 +75,7 @@ export function EnvDiff({
 		const inB = mapB.has(key);
 		if (inA && !inB) onlyInA.push(key);
 		else if (!inA && inB) onlyInB.push(key);
-		else if (mapA.get(key) !== mapB.get(key)) different.push(key);
+		else if (mapA.get(key)!.value !== mapB.get(key)!.value) different.push(key);
 		else same.push(key);
 	}
 
@@ -69,6 +96,31 @@ export function EnvDiff({
 		...different.map((k) => ({ key: k, type: 'different' as const })),
 		...same.map((k) => ({ key: k, type: 'same' as const })),
 	];
+
+	function startEdit(key: string, side: 'a' | 'b', currentValue: string) {
+		setEditingCell({ key, side });
+		setEditValue(currentValue);
+	}
+
+	function cancelEdit() {
+		setEditingCell(null);
+		setEditValue('');
+	}
+
+	async function saveEdit(key: string, side: 'a' | 'b') {
+		const map = side === 'a' ? mapA : mapB;
+		const entry = map.get(key);
+		if (!entry) return;
+		setIsSaving(true);
+		const updateFn = side === 'a' ? updateA : updateB;
+		await updateFn(entry.id, key, editValue);
+		setIsSaving(false);
+		setEditingCell(null);
+		setEditValue('');
+	}
+
+	const inputClass =
+		'w-full bg-white/5 border border-white/10 rounded-md px-2 py-1 text-xs font-mono text-zinc-100 outline-none focus:border-violet-500/60 focus:ring-1 focus:ring-violet-500/20 transition';
 
 	return (
 		<div className="space-y-4">
@@ -104,8 +156,15 @@ export function EnvDiff({
 					</thead>
 					<tbody>
 						{rows.map(({ key, type }) => {
-							const valA = mapA.get(key);
-							const valB = mapB.get(key);
+							const entryA = mapA.get(key);
+							const entryB = mapB.get(key);
+							const valA = entryA?.value;
+							const valB = entryB?.value;
+
+							const isEditingA =
+								editingCell?.key === key && editingCell.side === 'a';
+							const isEditingB =
+								editingCell?.key === key && editingCell.side === 'b';
 
 							const rowBg =
 								type === 'same'
@@ -137,18 +196,117 @@ export function EnvDiff({
 									key={key}
 									className={`border-b border-zinc-800/40 last:border-0 ${rowBg}`}
 								>
-									<td
-										className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] ${cellA}`}
-									>
-										{valA ?? '—'}
+									{/* Env A cell */}
+									<td className="px-4 py-2 max-w-0 w-[38%]">
+										{isEditingA ? (
+											<div className="flex items-center gap-1.5">
+												<input
+													type="text"
+													value={editValue}
+													onChange={(e) => setEditValue(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === 'Enter') saveEdit(key, 'a');
+														if (e.key === 'Escape') cancelEdit();
+													}}
+													className={inputClass}
+													disabled={isSaving}
+													autoFocus
+													autoComplete="off"
+													spellCheck={false}
+												/>
+												<button
+													type="button"
+													onClick={() => saveEdit(key, 'a')}
+													disabled={isSaving}
+													className="shrink-0 text-xs text-violet-400 hover:text-violet-300 disabled:opacity-50 transition-colors"
+												>
+													{isSaving ? '…' : 'Save'}
+												</button>
+												<button
+													type="button"
+													onClick={cancelEdit}
+													disabled={isSaving}
+													className="shrink-0 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+												>
+													✕
+												</button>
+											</div>
+										) : (
+											<div
+												className={`group/cell flex items-center gap-1.5 font-mono text-xs ${cellA}`}
+											>
+												<span className="truncate">{valA ?? '—'}</span>
+												{entryA && (
+													<button
+														type="button"
+														onClick={() => startEdit(key, 'a', valA ?? '')}
+														className="shrink-0 opacity-0 group-hover/cell:opacity-100 text-zinc-600 hover:text-violet-400 transition-all"
+														title={`Edit in ${envAName}`}
+													>
+														<PencilIcon />
+													</button>
+												)}
+											</div>
+										)}
 									</td>
-									<td className="px-4 py-3 text-center font-mono text-xs font-medium text-zinc-300">
+
+									{/* Key cell */}
+									<td className="px-4 py-2 text-center font-mono text-xs font-medium text-zinc-300">
 										{key}
 									</td>
-									<td
-										className={`px-4 py-3 font-mono text-xs truncate max-w-0 w-[38%] text-right ${cellB}`}
-									>
-										{valB ?? '—'}
+
+									{/* Env B cell */}
+									<td className="px-4 py-2 max-w-0 w-[38%]">
+										{isEditingB ? (
+											<div className="flex items-center justify-end gap-1.5">
+												<button
+													type="button"
+													onClick={cancelEdit}
+													disabled={isSaving}
+													className="shrink-0 text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+												>
+													✕
+												</button>
+												<button
+													type="button"
+													onClick={() => saveEdit(key, 'b')}
+													disabled={isSaving}
+													className="shrink-0 text-xs text-violet-400 hover:text-violet-300 disabled:opacity-50 transition-colors"
+												>
+													{isSaving ? '…' : 'Save'}
+												</button>
+												<input
+													type="text"
+													value={editValue}
+													onChange={(e) => setEditValue(e.target.value)}
+													onKeyDown={(e) => {
+														if (e.key === 'Enter') saveEdit(key, 'b');
+														if (e.key === 'Escape') cancelEdit();
+													}}
+													className={inputClass}
+													disabled={isSaving}
+													autoFocus
+													autoComplete="off"
+													spellCheck={false}
+												/>
+											</div>
+										) : (
+											<div
+												className={`group/cell flex items-center justify-end gap-1.5 font-mono text-xs ${cellB}`}
+											>
+												{entryB && (
+													<button
+														type="button"
+														onClick={() => startEdit(key, 'b', valB ?? '')}
+														className="shrink-0 opacity-0 group-hover/cell:opacity-100 text-zinc-600 hover:text-violet-400 transition-all"
+														title={`Edit in ${envBName}`}
+													>
+														<PencilIcon />
+													</button>
+												)}
+												<span className="truncate">{valB ?? '—'}</span>
+											</div>
+										)}
 									</td>
 								</tr>
 							);
