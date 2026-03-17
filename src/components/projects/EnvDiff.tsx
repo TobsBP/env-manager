@@ -75,7 +75,7 @@ export function EnvDiff({
 		const inB = mapB.has(key);
 		if (inA && !inB) onlyInA.push(key);
 		else if (!inA && inB) onlyInB.push(key);
-		else if (mapA.get(key)!.value !== mapB.get(key)!.value) different.push(key);
+		else if (mapA.get(key)?.value !== mapB.get(key)?.value) different.push(key);
 		else same.push(key);
 	}
 
