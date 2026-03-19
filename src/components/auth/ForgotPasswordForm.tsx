@@ -12,7 +12,7 @@ export function ForgotPasswordForm() {
 	const [fieldError, setFieldError] = useState<string | null>(null);
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setFieldError(null);
 

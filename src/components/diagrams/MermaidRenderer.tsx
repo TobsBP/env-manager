@@ -59,7 +59,7 @@ export function MermaidRenderer({ code }: Props) {
 	return (
 		<div
 			ref={containerRef}
-			className="flex items-center justify-center min-h-[120px] [&_svg]:max-w-full [&_svg]:h-auto"
+			className="flex items-center justify-center min-h-30 [&_svg]:max-w-full [&_svg]:h-auto"
 		/>
 	);
 }

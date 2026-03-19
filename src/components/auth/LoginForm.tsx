@@ -15,7 +15,7 @@ export function LoginForm() {
 	const [showPassword, setShowPassword] = useState(false);
 	const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setFieldErrors({});
 

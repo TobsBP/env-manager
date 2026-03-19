@@ -23,7 +23,7 @@ export function RegisterForm() {
 	const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
 	const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
-	const handleSubmit = async (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setFieldErrors({});
 
