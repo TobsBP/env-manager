@@ -6,7 +6,7 @@ const TEST_USER_EMAIL = process.env.TEST_USER_EMAIL as string;
 const TEST_USER_PASSWORD = process.env.TEST_USER_PASSWORD as string;
 
 setup('authenticate', async ({ page }) => {
-	if (TEST_USER_EMAIL && TEST_USER_PASSWORD) {
+	if (!TEST_USER_EMAIL || !TEST_USER_PASSWORD) {
 		throw Error('Set the email and pass');
 	}
 
