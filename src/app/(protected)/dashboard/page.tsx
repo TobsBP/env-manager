@@ -23,8 +23,8 @@ export default function DashboardPage() {
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
 			{/* Subtle background orbs */}
-			<div className="page-orb w-[700px] h-[700px] bg-violet-600 -top-40 -right-40" />
-			<div className="page-orb w-[500px] h-[500px] bg-blue-700 bottom-0 -left-20" />
+			<div className="page-orb w-175 h-175 bg-violet-600 -top-40 -right-40" />
+			<div className="page-orb w-125 h-125 bg-blue-700 bottom-0 -left-20" />
 
 			{/* Header */}
 			<header className="relative border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
@@ -115,7 +115,7 @@ export default function DashboardPage() {
 						{[1, 2, 3].map((n) => (
 							<div
 								key={n}
-								className="glass-card h-[72px] animate-pulse bg-white/[0.02]"
+								className="glass-card h-18 animate-pulse bg-white/2"
 							/>
 						))}
 					</div>

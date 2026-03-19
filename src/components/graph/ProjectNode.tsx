@@ -27,14 +27,14 @@ export function ProjectNode({ data }: NodeProps) {
 	const badgeClass = getEnvColor(nodeData.envName);
 
 	return (
-		<div className="glass-card min-w-[160px] px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-900/80 backdrop-blur-sm shadow-lg">
+		<div className="glass-card min-w-40 px-4 py-3 rounded-xl border border-zinc-700 bg-zinc-900/80 backdrop-blur-sm shadow-lg">
 			<Handle
 				type="target"
 				position={Position.Left}
-				className="!w-3 !h-3 !bg-violet-500 !border-2 !border-zinc-900"
+				className="w-3! h-3! bg-violet-500! border-2! border-zinc-900!"
 			/>
 			<div className="flex flex-col gap-1.5">
-				<span className="text-sm font-medium text-zinc-100 truncate max-w-[140px]">
+				<span className="text-sm font-medium text-zinc-100 truncate max-w-35">
 					{nodeData.label.split(' (')[0]}
 				</span>
 				<span
@@ -46,7 +46,7 @@ export function ProjectNode({ data }: NodeProps) {
 			<Handle
 				type="source"
 				position={Position.Right}
-				className="!w-3 !h-3 !bg-violet-500 !border-2 !border-zinc-900"
+				className="w-3! h-3! bg-violet-500! border-2! border-zinc-900!"
 			/>
 		</div>
 	);

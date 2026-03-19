@@ -47,7 +47,7 @@ export function DeleteEdge({
 					<button
 						type="button"
 						onClick={() => edgeData.onDelete(id)}
-						className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-xs text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:!opacity-100 hover:border-red-500 hover:text-red-400"
+						className="flex h-5 w-5 items-center justify-center rounded-full border border-zinc-600 bg-zinc-900 text-xs text-zinc-400 opacity-0 transition-opacity group-hover:opacity-100 hover:opacity-100! hover:border-red-500 hover:text-red-400"
 					>
 						×
 					</button>

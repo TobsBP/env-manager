@@ -32,8 +32,8 @@ export default function ProjectPage({ params }: Props) {
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
 			{/* Subtle background orbs */}
-			<div className="page-orb w-[600px] h-[600px] bg-violet-700 -top-20 -right-20" />
-			<div className="page-orb w-[400px] h-[400px] bg-indigo-700 bottom-10 -left-10" />
+			<div className="page-orb w-150 h-150 bg-violet-700 -top-20 -right-20" />
+			<div className="page-orb w-100 h-100 bg-indigo-700 bottom-10 -left-10" />
 
 			{/* Header */}
 			<header className="relative border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
@@ -114,6 +114,26 @@ export default function ProjectPage({ params }: Props) {
 					</div>
 					<div className="flex items-center gap-2">
 						<Link
+							href={`/projects/${projectId}/diagrams`}
+							className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<rect x="3" y="3" width="18" height="18" rx="2" />
+								<path d="M3 9h18M9 21V9" />
+							</svg>
+							Diagrams
+						</Link>
+						<Link
 							href={`/projects/${projectId}/diff`}
 							className={`flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 ${environments.length < 2 ? 'pointer-events-none opacity-40' : ''}`}
 							aria-disabled={environments.length < 2}
@@ -138,7 +158,7 @@ export default function ProjectPage({ params }: Props) {
 						<button
 							type="button"
 							onClick={() => setShowModal(true)}
-							className="btn-primary flex items-center gap-2 !w-fit h-9 px-4 text-sm"
+							className="btn-primary flex items-center gap-2 w-fit! h-9 px-4 text-sm"
 						>
 							<span className="text-base leading-none">+</span>
 							New Environment
@@ -151,7 +171,7 @@ export default function ProjectPage({ params }: Props) {
 						{[1, 2].map((n) => (
 							<div
 								key={n}
-								className="glass-card h-[72px] animate-pulse bg-white/[0.02]"
+								className="glass-card h-18 animate-pulse bg-white/2"
 							/>
 						))}
 					</div>
