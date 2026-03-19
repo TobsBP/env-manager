@@ -25,6 +25,7 @@ export default function DiagramDetailPage({ params }: Props) {
 	const [confirmDelete, setConfirmDelete] = useState(false);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [showExportMenu, setShowExportMenu] = useState(false);
+	const [showExpanded, setShowExpanded] = useState(false);
 
 	function exportSvg() {
 		const svgEl = document.querySelector<SVGElement>('.mermaid-output svg');
@@ -61,8 +62,8 @@ export default function DiagramDetailPage({ params }: Props) {
 
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
-			<div className="page-orb w-[600px] h-[600px] bg-violet-700 -top-20 -right-20" />
-			<div className="page-orb w-[400px] h-[400px] bg-indigo-700 bottom-10 -left-10" />
+			<div className="page-orb w-150 h-150 bg-violet-700 -top-20 -right-20" />
+			<div className="page-orb w-100 h-100 bg-indigo-700 bottom-10 -left-10" />
 
 			<header className="relative border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
 				<div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -151,7 +152,7 @@ export default function DiagramDetailPage({ params }: Props) {
 				</div>
 
 				{isLoading ? (
-					<div className="glass-card h-64 animate-pulse bg-white/[0.02]" />
+					<div className="glass-card h-64 animate-pulse bg-white/2" />
 				) : !diagram ? (
 					<div className="glass-card px-6 py-16 text-center">
 						<p className="text-zinc-400">Diagram not found.</p>
@@ -217,6 +218,29 @@ export default function DiagramDetailPage({ params }: Props) {
 										</div>
 									)}
 								</div>
+								<button
+									type="button"
+									onClick={() => setShowExpanded(true)}
+									className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										aria-hidden="true"
+									>
+										<polyline points="15 3 21 3 21 9" />
+										<polyline points="9 21 3 21 3 15" />
+										<line x1="21" y1="3" x2="14" y2="10" />
+										<line x1="3" y1="21" x2="10" y2="14" />
+									</svg>
+									Expand
+								</button>
 								<button
 									type="button"
 									onClick={() => setShowEdit(true)}
@@ -313,6 +337,43 @@ export default function DiagramDetailPage({ params }: Props) {
 							>
 								{isDeleting ? 'Deleting…' : 'Delete'}
 							</button>
+						</div>
+					</div>
+				</div>
+			)}
+			{showExpanded && diagram && (
+				// biome-ignore lint/a11y/noStaticElementInteractions: modal backdrop
+				<div
+					className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-sm"
+					onClick={(e) =>
+						e.target === e.currentTarget && setShowExpanded(false)
+					}
+					onKeyDown={(e) => e.key === 'Escape' && setShowExpanded(false)}
+				>
+					<div className="relative w-full h-full flex items-center justify-center p-8">
+						<button
+							type="button"
+							onClick={() => setShowExpanded(false)}
+							className="absolute top-4 right-4 flex items-center justify-center w-9 h-9 rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
+							aria-label="Close"
+						>
+							<svg
+								width="15"
+								height="15"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<line x1="18" y1="6" x2="6" y2="18" />
+								<line x1="6" y1="6" x2="18" y2="18" />
+							</svg>
+						</button>
+						<div className="w-full max-w-7xl overflow-auto max-h-full">
+							<MermaidRenderer code={diagram.code} />
 						</div>
 					</div>
 				</div>
