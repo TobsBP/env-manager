@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { use, useState } from 'react';
 import { DiagramCard } from '@/components/diagrams/DiagramCard';
+import { MermaidRenderer } from '@/components/diagrams/MermaidRenderer';
 import { NewDiagramModal } from '@/components/diagrams/NewDiagramModal';
 import { useDiagrams } from '@/hooks/useDiagrams';
 import { useProject } from '@/hooks/useProject';
@@ -28,11 +29,12 @@ export default function DiagramsPage({ params }: Props) {
 	} = useDiagrams(projectId);
 	const [showModal, setShowModal] = useState(false);
 	const [editTarget, setEditTarget] = useState<Diagram | null>(null);
+	const [viewAll, setViewAll] = useState(false);
 
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
-			<div className="page-orb w-[600px] h-[600px] bg-violet-700 -top-20 -right-20" />
-			<div className="page-orb w-[400px] h-[400px] bg-indigo-700 bottom-10 -left-10" />
+			<div className="page-orb w-150 h-150 bg-violet-700 -top-20 -right-20" />
+			<div className="page-orb w-100 h-100 bg-indigo-700 bottom-10 -left-10" />
 
 			<header className="relative border-b border-zinc-800/80 bg-zinc-900/40 backdrop-blur-md">
 				<div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-4">
@@ -127,14 +129,65 @@ export default function DiagramsPage({ params }: Props) {
 							Mermaid diagrams associated with this project.
 						</p>
 					</div>
-					<button
-						type="button"
-						onClick={() => setShowModal(true)}
-						className="btn-primary flex items-center gap-2 !w-fit h-9 px-4 text-sm"
-					>
-						<span className="text-base leading-none">+</span>
-						New Diagram
-					</button>
+					<div className="flex items-center gap-2">
+						{!isLoading && diagrams.length > 0 && (
+							<button
+								type="button"
+								onClick={() => setViewAll((v) => !v)}
+								className="flex items-center gap-2 rounded-lg border border-zinc-700/80 px-4 py-1.5 text-sm text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 h-9"
+							>
+								{viewAll ? (
+									<>
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											aria-hidden="true"
+										>
+											<line x1="8" y1="6" x2="21" y2="6" />
+											<line x1="8" y1="12" x2="21" y2="12" />
+											<line x1="8" y1="18" x2="21" y2="18" />
+											<line x1="3" y1="6" x2="3.01" y2="6" />
+											<line x1="3" y1="12" x2="3.01" y2="12" />
+											<line x1="3" y1="18" x2="3.01" y2="18" />
+										</svg>
+										List View
+									</>
+								) : (
+									<>
+										<svg
+											width="14"
+											height="14"
+											viewBox="0 0 24 24"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2"
+											strokeLinecap="round"
+											strokeLinejoin="round"
+											aria-hidden="true"
+										>
+											<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+											<circle cx="12" cy="12" r="3" />
+										</svg>
+										View All
+									</>
+								)}
+							</button>
+						)}
+						<button
+							type="button"
+							onClick={() => setShowModal(true)}
+							className="btn-primary flex items-center gap-2 w-fit! h-9 px-4 text-sm"
+						>
+							<span className="text-base leading-none">+</span>
+							New Diagram
+						</button>
+					</div>
 				</div>
 
 				{error && (
@@ -148,7 +201,7 @@ export default function DiagramsPage({ params }: Props) {
 						{[1, 2].map((n) => (
 							<div
 								key={n}
-								className="glass-card h-[72px] animate-pulse bg-white/[0.02]"
+								className="glass-card h-18 animate-pulse bg-white/2"
 							/>
 						))}
 					</div>
@@ -171,6 +224,17 @@ export default function DiagramsPage({ params }: Props) {
 							</button>{' '}
 							to create your first Mermaid diagram.
 						</p>
+					</div>
+				) : viewAll ? (
+					<div className="grid grid-cols-1 gap-6">
+						{diagrams.map((diagram) => (
+							<div key={diagram.id} className="glass-card p-6">
+								<h2 className="text-sm font-medium text-zinc-300 mb-4">
+									{diagram.name}
+								</h2>
+								<MermaidRenderer code={diagram.code} />
+							</div>
+						))}
 					</div>
 				) : (
 					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
