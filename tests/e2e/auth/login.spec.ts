@@ -18,8 +18,10 @@ test('redireciona para /login quando não autenticado', async ({ page }) => {
 
 test('exibe erro com credenciais inválidas', async ({ page }) => {
 	await page.goto('/login');
-	await page.getByLabel('Email').fill('invalido@test.com');
-	await page.getByLabel('Password').fill('wrongpassword');
+	await page
+		.getByRole('textbox', { name: 'Email address' })
+		.fill('invalido@test.com');
+	await page.getByRole('textbox', { name: 'Password' }).fill('wrongpassword');
 	await page.getByRole('button', { name: /sign in/i }).click();
 	await expect(page.getByRole('alert')).toBeVisible();
 });
