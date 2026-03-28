@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useVariables } from '@/hooks/useVariables';
+import { computeEnvDiff } from '@/utils/env-diff';
 
 interface Props {
 	projectId: string;
@@ -63,39 +64,19 @@ export function EnvDiff({
 
 	const mapA = new Map(varsA.map((v) => [v.key, { id: v.id, value: v.value }]));
 	const mapB = new Map(varsB.map((v) => [v.key, { id: v.id, value: v.value }]));
-	const allKeys = Array.from(new Set([...mapA.keys(), ...mapB.keys()])).sort();
 
-	const onlyInA: string[] = [];
-	const onlyInB: string[] = [];
-	const different: string[] = [];
-	const same: string[] = [];
+	const { rows, onlyInA, onlyInB, different, same } = computeEnvDiff(
+		varsA,
+		varsB,
+	);
 
-	for (const key of allKeys) {
-		const inA = mapA.has(key);
-		const inB = mapB.has(key);
-		if (inA && !inB) onlyInA.push(key);
-		else if (!inA && inB) onlyInB.push(key);
-		else if (mapA.get(key)?.value !== mapB.get(key)?.value) different.push(key);
-		else same.push(key);
-	}
-
-	if (allKeys.length === 0) {
+	if (mapA.size === 0 && mapB.size === 0) {
 		return (
 			<div className="glass-card px-6 py-10 text-center text-zinc-500 text-sm">
 				Both environments have no variables.
 			</div>
 		);
 	}
-
-	const rows: {
-		key: string;
-		type: 'only-a' | 'only-b' | 'different' | 'same';
-	}[] = [
-		...onlyInA.map((k) => ({ key: k, type: 'only-a' as const })),
-		...onlyInB.map((k) => ({ key: k, type: 'only-b' as const })),
-		...different.map((k) => ({ key: k, type: 'different' as const })),
-		...same.map((k) => ({ key: k, type: 'same' as const })),
-	];
 
 	function startEdit(key: string, side: 'a' | 'b', currentValue: string) {
 		setEditingCell({ key, side });

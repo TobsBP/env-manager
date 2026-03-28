@@ -10,7 +10,6 @@ import {
 import { useState } from 'react';
 import { createSessionAction, signOutAction } from '@/lib/auth/actions';
 import { auth } from '@/lib/firebase/client';
-import { getFirebaseAuthErrorMessage } from '@/lib/firebase/errors';
 import {
 	type AuthResult,
 	type ForgotPasswordInput,
@@ -20,6 +19,7 @@ import {
 	type RegisterCredentials,
 	registerSchema,
 } from '@/types/auth';
+import { getFirebaseAuthErrorMessage } from '@/utils/firebase';
 
 export function useAuth() {
 	const [isLoading, setIsLoading] = useState(false);

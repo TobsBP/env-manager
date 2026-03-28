@@ -8,19 +8,11 @@ import { useEnvironments } from '@/hooks/useEnvironments';
 import { useUser } from '@/hooks/useUser';
 import { signOutAction } from '@/lib/auth/actions';
 import type { Environment } from '@/types/project';
+import { ENV_DOT } from '@/utils/env-diff';
 
 interface Props {
 	params: Promise<{ projectId: string }>;
 }
-
-const ENV_DOT: Record<string, string> = {
-	prod: 'bg-red-400',
-	production: 'bg-red-400',
-	dev: 'bg-emerald-400',
-	development: 'bg-emerald-400',
-	homolog: 'bg-amber-400',
-	staging: 'bg-amber-400',
-};
 
 interface EnvPickerProps {
 	label: string;
