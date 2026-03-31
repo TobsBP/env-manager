@@ -5,8 +5,11 @@ import { use, useState } from 'react';
 import { CloneEnvironmentModal } from '@/components/projects/CloneEnvironmentModal';
 import { EnvironmentCard } from '@/components/projects/EnvironmentCard';
 import { NewEnvironmentModal } from '@/components/projects/NewEnvironmentModal';
+import { NewSubprojectModal } from '@/components/projects/NewSubprojectModal';
+import { SubprojectCard } from '@/components/projects/SubprojectCard';
 import { useEnvironments } from '@/hooks/useEnvironments';
 import { useProject } from '@/hooks/useProject';
+import { useSubprojects } from '@/hooks/useSubprojects';
 import { useUser } from '@/hooks/useUser';
 import { signOutAction } from '@/lib/auth/actions';
 import type { Environment } from '@/types/project';
@@ -26,8 +29,16 @@ export default function ProjectPage({ params }: Props) {
 		deleteEnvironment,
 		cloneEnvironment,
 	} = useEnvironments(projectId);
+	const {
+		subprojects,
+		isLoading: subprojectsLoading,
+		createSubproject,
+		updateSubproject,
+		deleteSubproject,
+	} = useSubprojects(projectId);
 	const [showModal, setShowModal] = useState(false);
 	const [cloneTarget, setCloneTarget] = useState<Environment | null>(null);
+	const [showSubprojectModal, setShowSubprojectModal] = useState(false);
 
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
@@ -208,6 +219,68 @@ export default function ProjectPage({ params }: Props) {
 						))}
 					</div>
 				)}
+
+				{/* Subprojects section */}
+				<div className="mt-12">
+					<div className="mb-5 flex items-center justify-between">
+						<div className="flex items-center gap-3">
+							<h2 className="text-xl font-semibold tracking-tight text-zinc-200">
+								Subprojects
+							</h2>
+							{!subprojectsLoading && subprojects.length > 0 && (
+								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
+									{subprojects.length}
+								</span>
+							)}
+						</div>
+						<button
+							type="button"
+							onClick={() => setShowSubprojectModal(true)}
+							className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-violet-500/50 hover:text-violet-300 hover:bg-violet-500/5"
+						>
+							<span className="text-base leading-none">+</span>
+							New Subproject
+						</button>
+					</div>
+
+					{subprojectsLoading ? (
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+							{[1, 2].map((n) => (
+								<div
+									key={n}
+									className="glass-card h-18 animate-pulse bg-white/2"
+								/>
+							))}
+						</div>
+					) : subprojects.length === 0 ? (
+						<div className="glass-card px-6 py-10 text-center border-dashed">
+							<div className="w-12 h-12 rounded-2xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center text-xl mx-auto mb-3">
+								📦
+							</div>
+							<p className="text-sm font-medium text-zinc-400 mb-1">
+								No subprojects yet
+							</p>
+							<p className="text-xs text-zinc-600">
+								Break this project into services like Backend, Frontend,
+								Worker...
+							</p>
+						</div>
+					) : (
+						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+							{subprojects.map((sub) => (
+								<SubprojectCard
+									key={sub.id}
+									subproject={sub}
+									projectId={projectId}
+									onUpdate={(id, name, emoji) =>
+										updateSubproject(id, name, emoji)
+									}
+									onDelete={deleteSubproject}
+								/>
+							))}
+						</div>
+					)}
+				</div>
 			</main>
 
 			{showModal && (
@@ -222,6 +295,13 @@ export default function ProjectPage({ params }: Props) {
 					envName={cloneTarget.name}
 					onClose={() => setCloneTarget(null)}
 					onClone={(newName) => cloneEnvironment(cloneTarget.id, newName)}
+				/>
+			)}
+
+			{showSubprojectModal && (
+				<NewSubprojectModal
+					onClose={() => setShowSubprojectModal(false)}
+					onCreate={createSubproject}
 				/>
 			)}
 		</div>

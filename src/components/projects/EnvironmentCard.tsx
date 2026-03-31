@@ -2,52 +2,12 @@
 
 import Link from 'next/link';
 import type { Environment } from '@/types/project';
-
-const ENV_CONFIG: Record<
-	string,
-	{ badge: string; dot: string; label: string }
-> = {
-	prod: {
-		badge: 'bg-red-500/10 text-red-400 border-red-500/25',
-		dot: 'bg-red-400',
-		label: 'Production',
-	},
-	production: {
-		badge: 'bg-red-500/10 text-red-400 border-red-500/25',
-		dot: 'bg-red-400',
-		label: 'Production',
-	},
-	dev: {
-		badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
-		dot: 'bg-emerald-400',
-		label: 'Development',
-	},
-	development: {
-		badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/25',
-		dot: 'bg-emerald-400',
-		label: 'Development',
-	},
-	homolog: {
-		badge: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
-		dot: 'bg-amber-400',
-		label: 'Homologation',
-	},
-	staging: {
-		badge: 'bg-amber-500/10 text-amber-400 border-amber-500/25',
-		dot: 'bg-amber-400',
-		label: 'Staging',
-	},
-};
-
-const DEFAULT_ENV = {
-	badge: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/25',
-	dot: 'bg-zinc-400',
-	label: null,
-};
+import { DEFAULT_ENV, ENV_CONFIG } from '@/utils/consts/env';
 
 interface Props {
 	environment: Environment;
 	projectId: string;
+	subprojectId?: string;
 	onDelete: (id: string) => void;
 	onClone: (env: Environment) => void;
 }
@@ -55,17 +15,18 @@ interface Props {
 export function EnvironmentCard({
 	environment,
 	projectId,
+	subprojectId,
 	onDelete,
 	onClone,
 }: Props) {
 	const config = ENV_CONFIG[environment.name.toLowerCase()] ?? DEFAULT_ENV;
+	const href = subprojectId
+		? `/projects/${projectId}/subprojects/${subprojectId}/environments/${environment.id}`
+		: `/projects/${projectId}/environments/${environment.id}`;
 
 	return (
 		<div className="glass-card flex items-center justify-between px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
-			<Link
-				href={`/projects/${projectId}/environments/${environment.id}`}
-				className="flex items-center gap-4 flex-1 min-w-0"
-			>
+			<Link href={href} className="flex items-center gap-4 flex-1 min-w-0">
 				<div className="w-10 h-10 rounded-xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center shrink-0 group-hover:ring-violet-500/20 transition-all">
 					<div
 						className={`w-2.5 h-2.5 rounded-full ${config.dot} shadow-[0_0_8px_currentColor]`}
