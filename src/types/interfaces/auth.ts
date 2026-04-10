@@ -9,3 +9,8 @@ export interface AuthContextValue {
 	isLoading: boolean;
 	signOut: () => Promise<void>;
 }
+
+export interface AuthProviderProps {
+	children: React.ReactNode;
+	initialUser: SessionUser | null;
+}
