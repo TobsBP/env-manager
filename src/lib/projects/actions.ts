@@ -8,6 +8,7 @@ import type { AuthResult } from '@/types/auth';
 import {
 	createEnvironmentSchema,
 	createProjectSchema,
+	projectTypeSchema,
 	updateProjectSchema,
 } from '@/types/project';
 
@@ -62,7 +63,11 @@ export async function updateProjectAction(
 	await db
 		.collection('projects')
 		.doc(projectId)
-		.update({ name: result.data.name, emoji: result.data.emoji });
+		.update({
+			name: result.data.name,
+			emoji: result.data.emoji,
+			figmaUrl: result.data.figmaUrl ?? '',
+		});
 
 	return { success: true };
 }
@@ -287,6 +292,29 @@ export async function deployToEasypanelAction(
 		const text = await deployRes.text();
 		return { success: false, error: `Failed to deploy: ${text}` };
 	}
+
+	return { success: true };
+}
+
+export async function updateProjectTypeAction(
+	projectId: string,
+	projectType: unknown,
+): Promise<AuthResult> {
+	const user = await getSessionUser();
+	if (!user) return { success: false, error: 'Not authenticated' };
+
+	const result = projectTypeSchema.safeParse(projectType);
+	if (!result.success) return { success: false, error: 'Invalid project type' };
+
+	const db = getAdminDb();
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (role !== 'owner') return { success: false, error: 'Unauthorized' };
+
+	await db
+		.collection('projects')
+		.doc(projectId)
+		.update({ projectType: result.data });
 
 	return { success: true };
 }

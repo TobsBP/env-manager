@@ -12,7 +12,7 @@ import { useProject } from '@/hooks/useProject';
 import { useSubprojects } from '@/hooks/useSubprojects';
 import { useUser } from '@/hooks/useUser';
 import { signOutAction } from '@/lib/auth/actions';
-import type { Environment } from '@/types/project';
+import type { Environment, ProjectType } from '@/types/project';
 
 interface Props {
 	params: Promise<{ projectId: string }>;
@@ -21,7 +21,7 @@ interface Props {
 export default function ProjectPage({ params }: Props) {
 	const { projectId } = use(params);
 	const { user } = useUser();
-	const { project } = useProject(projectId);
+	const { project, updateProjectType } = useProject(projectId);
 	const {
 		environments,
 		isLoading,
@@ -39,6 +39,17 @@ export default function ProjectPage({ params }: Props) {
 	const [showModal, setShowModal] = useState(false);
 	const [cloneTarget, setCloneTarget] = useState<Environment | null>(null);
 	const [showSubprojectModal, setShowSubprojectModal] = useState(false);
+	const [isUpdatingType, setIsUpdatingType] = useState(false);
+
+	const isOwner = !project || project.userId === user?.uid;
+	const projectType: ProjectType = project?.projectType ?? 'single';
+
+	async function handleTypeChange(newType: ProjectType) {
+		if (isUpdatingType) return;
+		setIsUpdatingType(true);
+		await updateProjectType(newType);
+		setIsUpdatingType(false);
+	}
 
 	return (
 		<div className="relative min-h-screen bg-zinc-950 text-zinc-50 overflow-hidden">
@@ -97,9 +108,90 @@ export default function ProjectPage({ params }: Props) {
 					<span className="text-zinc-300">Environments</span>
 				</div>
 
-				{(project?.projectType === 'single' ||
-					project?.projectType === 'both' ||
-					project?.projectType === undefined) && (
+				{/* Project type selector + Diagrams */}
+				<div className="mb-8 flex items-center justify-between">
+					{isOwner && project ? (
+						<div className="flex items-center gap-2">
+							<span className="text-xs text-zinc-500">Tipo:</span>
+							{(
+								[
+									{ value: 'single', label: 'Único', icon: '📄' },
+									{ value: 'subprojects', label: 'Subprojetos', icon: '📦' },
+									{ value: 'both', label: 'Ambos', icon: '🗂️' },
+								] as { value: ProjectType; label: string; icon: string }[]
+							).map((type) => {
+								const isActive = projectType === type.value;
+								return (
+									<button
+										key={type.value}
+										type="button"
+										onClick={() => !isActive && handleTypeChange(type.value)}
+										disabled={isUpdatingType || isActive}
+										className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-all ${
+											isActive
+												? 'border-violet-500/50 bg-violet-500/10 text-violet-300 cursor-default'
+												: 'border-zinc-700/80 text-zinc-500 hover:border-zinc-500 hover:text-zinc-300 disabled:opacity-40'
+										}`}
+									>
+										<span>{type.icon}</span>
+										{type.label}
+									</button>
+								);
+							})}
+						</div>
+					) : (
+						<div />
+					)}
+					<div className="flex items-center gap-2">
+						{project && (
+							<Link
+								href={`/projects/${projectId}/figma`}
+								className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
+							>
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M5 5.5A3.5 3.5 0 0 1 8.5 2H12v7H8.5A3.5 3.5 0 0 1 5 5.5z" />
+									<path d="M12 2h3.5a3.5 3.5 0 1 1 0 7H12V2z" />
+									<path d="M12 12.5a3.5 3.5 0 1 1 7 0 3.5 3.5 0 1 1-7 0z" />
+									<path d="M5 19.5A3.5 3.5 0 0 1 8.5 16H12v3.5a3.5 3.5 0 1 1-7 0z" />
+									<path d="M5 12.5A3.5 3.5 0 0 1 8.5 9H12v7H8.5A3.5 3.5 0 0 1 5 12.5z" />
+								</svg>
+								Figmas
+							</Link>
+						)}
+						<Link
+							href={`/projects/${projectId}/diagrams`}
+							className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
+						>
+							<svg
+								width="14"
+								height="14"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<rect x="3" y="3" width="18" height="18" rx="2" />
+								<path d="M3 9h18M9 21V9" />
+							</svg>
+							Diagrams
+						</Link>
+					</div>
+				</div>
+
+				{(projectType === 'single' || projectType === 'both') && (
 					<div className="mb-8 flex items-start justify-between">
 						<div>
 							<div className="flex items-center gap-3 mb-1">
@@ -127,26 +219,6 @@ export default function ProjectPage({ params }: Props) {
 							</p>
 						</div>
 						<div className="flex items-center gap-2">
-							<Link
-								href={`/projects/${projectId}/diagrams`}
-								className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
-							>
-								<svg
-									width="14"
-									height="14"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-									aria-hidden="true"
-								>
-									<rect x="3" y="3" width="18" height="18" rx="2" />
-									<path d="M3 9h18M9 21V9" />
-								</svg>
-								Diagrams
-							</Link>
 							<Link
 								href={`/projects/${projectId}/diff`}
 								className={`flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 ${environments.length < 2 ? 'pointer-events-none opacity-40' : ''}`}
@@ -181,9 +253,7 @@ export default function ProjectPage({ params }: Props) {
 					</div>
 				)}
 
-				{(project?.projectType === 'single' ||
-					project?.projectType === 'both' ||
-					project?.projectType === undefined) &&
+				{(projectType === 'single' || projectType === 'both') &&
 					(isLoading ? (
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 							{[1, 2].map((n) => (
@@ -228,9 +298,7 @@ export default function ProjectPage({ params }: Props) {
 					))}
 
 				{/* Subprojects section */}
-				{(project?.projectType === 'subprojects' ||
-					project?.projectType === 'both' ||
-					project?.projectType === undefined) && (
+				{(projectType === 'subprojects' || projectType === 'both') && (
 					<div className="mt-12">
 						<div className="mb-5 flex items-center justify-between">
 							<div className="flex items-center gap-3">

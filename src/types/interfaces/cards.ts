@@ -14,6 +14,7 @@ export interface ProjectCardProps {
 		id: string,
 		name: string,
 		emoji: string,
+		figmaUrl: string,
 	) => Promise<MutationResult>;
 	onDelete?: (id: string) => void;
 	onShare?: () => void;

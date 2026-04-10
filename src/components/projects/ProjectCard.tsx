@@ -16,6 +16,7 @@ export function ProjectCard({
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(project.name);
 	const [emoji, setEmoji] = useState(project.emoji ?? '📁');
+	const [figmaUrl, setFigmaUrl] = useState(project.figmaUrl ?? '');
 	const [showPicker, setShowPicker] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
@@ -28,6 +29,7 @@ export function ProjectCard({
 		e.preventDefault();
 		setName(project.name);
 		setEmoji(project.emoji ?? '📁');
+		setFigmaUrl(project.figmaUrl ?? '');
 		setShowPicker(false);
 		setError(null);
 		setEditing(true);
@@ -46,12 +48,16 @@ export function ProjectCard({
 			cancelEdit();
 			return;
 		}
-		if (trimmed === project.name && emoji === project.emoji) {
+		if (
+			trimmed === project.name &&
+			emoji === project.emoji &&
+			figmaUrl.trim() === (project.figmaUrl ?? '')
+		) {
 			cancelEdit();
 			return;
 		}
 		setIsSaving(true);
-		const result = await onUpdate(project.id, trimmed, emoji);
+		const result = await onUpdate(project.id, trimmed, emoji, figmaUrl.trim());
 		setIsSaving(false);
 		if (result.success) {
 			setEditing(false);
@@ -107,6 +113,18 @@ export function ProjectCard({
 					>
 						Cancel
 					</button>
+				</div>
+
+				<div className="flex items-center gap-2 pl-0.5">
+					<span className="text-base shrink-0">🎨</span>
+					<input
+						type="url"
+						value={figmaUrl}
+						onChange={(e) => setFigmaUrl(e.target.value)}
+						disabled={isSaving}
+						placeholder="https://figma.com/file/..."
+						className="flex-1 min-w-0 bg-white/5 border border-white/10 rounded-lg px-3 py-1.5 text-sm text-zinc-100 outline-none focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/15 transition placeholder:text-zinc-600"
+					/>
 				</div>
 
 				{showPicker && (

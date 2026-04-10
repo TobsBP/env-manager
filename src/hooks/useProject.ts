@@ -1,9 +1,14 @@
 'use client';
 
 import { doc, onSnapshot } from 'firebase/firestore';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { db } from '@/lib/firebase/firestore';
-import type { Project } from '@/types/project';
+import {
+	updateProjectAction,
+	updateProjectTypeAction,
+} from '@/lib/projects/actions';
+import type { AuthResult } from '@/types/auth';
+import type { Project, ProjectType } from '@/types/project';
 
 export function useProject(projectId: string) {
 	const [project, setProject] = useState<Project | null>(null);
@@ -26,5 +31,24 @@ export function useProject(projectId: string) {
 		return unsubscribe;
 	}, [projectId]);
 
-	return { project, isLoading };
+	const updateProjectType = useCallback(
+		async (projectType: ProjectType): Promise<AuthResult> => {
+			return updateProjectTypeAction(projectId, projectType);
+		},
+		[projectId],
+	);
+
+	const updateFigmaUrl = useCallback(
+		async (figmaUrl: string): Promise<AuthResult> => {
+			if (!project) return { success: false, error: 'Project not loaded' };
+			return updateProjectAction(projectId, {
+				name: project.name,
+				emoji: project.emoji ?? '📁',
+				figmaUrl,
+			});
+		},
+		[projectId, project],
+	);
+
+	return { project, isLoading, updateProjectType, updateFigmaUrl };
 }

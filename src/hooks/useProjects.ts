@@ -153,11 +153,18 @@ export function useProjects() {
 			projectId: string,
 			name: string,
 			emoji: string,
+			figmaUrl = '',
 		): Promise<AuthResult> => {
 			setOwnedProjects((prev) =>
-				prev.map((p) => (p.id === projectId ? { ...p, name, emoji } : p)),
+				prev.map((p) =>
+					p.id === projectId ? { ...p, name, emoji, figmaUrl } : p,
+				),
 			);
-			const result = await updateProjectAction(projectId, { name, emoji });
+			const result = await updateProjectAction(projectId, {
+				name,
+				emoji,
+				figmaUrl,
+			});
 			if (!result.success) setError(result.error);
 			return result;
 		},

@@ -10,6 +10,7 @@ export interface Project {
 	createdAt: unknown;
 	projectType?: ProjectType;
 	memberUids?: string[];
+	figmaUrl?: string;
 }
 
 export interface ProjectMember {
@@ -33,4 +34,11 @@ export interface Environment {
 	easypanelUrl?: string;
 	easypanelToken?: string;
 	easypanelServiceName?: string;
+}
+
+export interface SubFigma {
+	id: string;
+	name: string;
+	url: string;
+	createdAt: unknown;
 }

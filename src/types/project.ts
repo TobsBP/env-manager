@@ -18,6 +18,7 @@ export const updateProjectSchema = z.object({
 		.min(1, 'Project name is required')
 		.max(50, 'Project name too long'),
 	emoji: z.string().default('📁'),
+	figmaUrl: z.url('URL inválida').optional().or(z.literal('')),
 });
 
 export type UpdateProjectInput = z.infer<typeof updateProjectSchema>;
@@ -35,8 +36,22 @@ export type CreateEnvironmentInput = z.infer<typeof createEnvironmentSchema>;
 export type {
 	Environment,
 	Project,
+	SubFigma,
 	Subproject,
 } from '@/types/interfaces/project';
+
+export const createSubFigmaSchema = z.object({
+	name: z.string().min(1, 'Name is required').max(60, 'Name too long'),
+	url: z.url('URL inválida'),
+});
+
+export const updateSubFigmaSchema = z.object({
+	name: z.string().min(1, 'Name is required').max(60, 'Name too long'),
+	url: z.url('URL inválida'),
+});
+
+export type CreateSubFigmaInput = z.infer<typeof createSubFigmaSchema>;
+export type UpdateSubFigmaInput = z.infer<typeof updateSubFigmaSchema>;
 
 export const createSubprojectSchema = z.object({
 	name: z
