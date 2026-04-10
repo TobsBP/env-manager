@@ -27,9 +27,4 @@ export const updateVariableSchema = z.object({
 export type CreateVariableInput = z.infer<typeof createVariableSchema>;
 export type UpdateVariableInput = z.infer<typeof updateVariableSchema>;
 
-export interface EnvVariable {
-	id: string;
-	key: string;
-	value: string;
-	createdAt: unknown;
-}
+export type { EnvVariable } from '@/types/interfaces/variable';

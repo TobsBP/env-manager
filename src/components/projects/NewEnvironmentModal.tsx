@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { AuthResult } from '@/types/auth';
+import type { NewEnvironmentModalProps } from '@/types/interfaces/modals';
 import { PRESET_ENVS } from '@/utils/consts/env';
 
-interface Props {
-	onClose: () => void;
-	onCreate: (name: string) => Promise<AuthResult>;
-}
-
-export function NewEnvironmentModal({ onClose, onCreate }: Props) {
+export function NewEnvironmentModal({
+	onClose,
+	onCreate,
+}: NewEnvironmentModalProps) {
 	const [name, setName] = useState('');
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);

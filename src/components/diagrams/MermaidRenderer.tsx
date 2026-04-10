@@ -2,14 +2,11 @@
 
 import mermaid from 'mermaid';
 import { useEffect, useRef, useState } from 'react';
-
-interface Props {
-	code: string;
-}
+import type { MermaidRendererProps } from '@/types/interfaces/components';
 
 let initialized = false;
 
-export function MermaidRenderer({ code }: Props) {
+export function MermaidRenderer({ code }: MermaidRendererProps) {
 	const containerRef = useRef<HTMLDivElement>(null);
 	const [renderError, setRenderError] = useState<string | null>(null);
 

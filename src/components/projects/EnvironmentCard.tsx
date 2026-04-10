@@ -1,16 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import type { Environment } from '@/types/project';
+import type { EnvironmentCardProps } from '@/types/interfaces/cards';
 import { DEFAULT_ENV, ENV_CONFIG } from '@/utils/consts/env';
-
-interface Props {
-	environment: Environment;
-	projectId: string;
-	subprojectId?: string;
-	onDelete: (id: string) => void;
-	onClone: (env: Environment) => void;
-}
 
 export function EnvironmentCard({
 	environment,
@@ -18,7 +10,7 @@ export function EnvironmentCard({
 	subprojectId,
 	onDelete,
 	onClone,
-}: Props) {
+}: EnvironmentCardProps) {
 	const config = ENV_CONFIG[environment.name.toLowerCase()] ?? DEFAULT_ENV;
 	const href = subprojectId
 		? `/projects/${projectId}/subprojects/${subprojectId}/environments/${environment.id}`

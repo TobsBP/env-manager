@@ -2,15 +2,8 @@
 
 import { useState } from 'react';
 import { useVariables } from '@/hooks/useVariables';
+import type { EnvDiffProps } from '@/types/interfaces/components';
 import { computeEnvDiff } from '@/utils/env-diff';
-
-interface Props {
-	projectId: string;
-	envAId: string;
-	envAName: string;
-	envBId: string;
-	envBName: string;
-}
 
 const PencilIcon = () => (
 	<svg
@@ -35,7 +28,7 @@ export function EnvDiff({
 	envAName,
 	envBId,
 	envBName,
-}: Props) {
+}: EnvDiffProps) {
 	const {
 		variables: varsA,
 		isLoading: loadingA,

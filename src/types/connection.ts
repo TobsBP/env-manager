@@ -9,12 +9,4 @@ export const createConnectionSchema = z.object({
 
 export type CreateConnectionInput = z.infer<typeof createConnectionSchema>;
 
-export interface Connection {
-	id: string;
-	userId: string;
-	fromProjectId: string;
-	fromEnvId: string;
-	toProjectId: string;
-	toEnvId: string;
-	createdAt: unknown;
-}
+export type { Connection } from '@/types/interfaces/connection';

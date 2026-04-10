@@ -2,27 +2,15 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import type { MutationResult } from '@/types/auth';
-import type { Subproject } from '@/types/project';
+import type { SubprojectCardProps } from '@/types/interfaces/cards';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
-
-interface Props {
-	subproject: Subproject;
-	projectId: string;
-	onUpdate: (
-		id: string,
-		name: string,
-		emoji: string,
-	) => Promise<MutationResult>;
-	onDelete: (id: string) => void;
-}
 
 export function SubprojectCard({
 	subproject,
 	projectId,
 	onUpdate,
 	onDelete,
-}: Props) {
+}: SubprojectCardProps) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(subproject.name);
 	const [emoji, setEmoji] = useState(subproject.emoji ?? '📦');

@@ -1,16 +1,8 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import type { AuthResult } from '@/types/auth';
+import type { NewDiagramModalProps } from '@/types/interfaces/modals';
 import { MermaidRenderer } from './MermaidRenderer';
-
-interface Props {
-	onClose: () => void;
-	onSave: (name: string, code: string) => Promise<AuthResult>;
-	initialName?: string;
-	initialCode?: string;
-	mode?: 'create' | 'edit';
-}
 
 export function NewDiagramModal({
 	onClose,
@@ -18,7 +10,7 @@ export function NewDiagramModal({
 	initialName = '',
 	initialCode = '',
 	mode = 'create',
-}: Props) {
+}: NewDiagramModalProps) {
 	const [name, setName] = useState(initialName);
 	const [code, setCode] = useState(initialCode);
 	const [isLoading, setIsLoading] = useState(false);

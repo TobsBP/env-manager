@@ -1,16 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import type { Diagram } from '@/types/diagram';
+import type { DiagramCardProps } from '@/types/interfaces/cards';
 
-interface Props {
-	diagram: Diagram;
-	projectId: string;
-	onDelete: (id: string) => void;
-	onEdit: (diagram: Diagram) => void;
-}
-
-export function DiagramCard({ diagram, projectId, onDelete, onEdit }: Props) {
+export function DiagramCard({
+	diagram,
+	projectId,
+	onDelete,
+	onEdit,
+}: DiagramCardProps) {
 	return (
 		<div className="glass-card flex items-center justify-between px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
 			<Link

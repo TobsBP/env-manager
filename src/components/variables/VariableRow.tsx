@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { MutationResult } from '@/types/auth';
-import type { EnvVariable } from '@/types/variable';
+import type { VariableRowProps } from '@/types/interfaces/components';
 
-interface Props {
-	variable: EnvVariable;
-	onUpdate: (id: string, key: string, value: string) => Promise<MutationResult>;
-	onDelete: (id: string) => Promise<MutationResult>;
-}
-
-export function VariableRow({ variable, onUpdate, onDelete }: Props) {
+export function VariableRow({
+	variable,
+	onUpdate,
+	onDelete,
+}: VariableRowProps) {
 	const [visible, setVisible] = useState(false);
 	const [editing, setEditing] = useState(false);
 	const [editKey, setEditKey] = useState(variable.key);

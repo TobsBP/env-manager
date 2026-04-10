@@ -13,10 +13,4 @@ export const updateDiagramSchema = z.object({
 export type CreateDiagramInput = z.infer<typeof createDiagramSchema>;
 export type UpdateDiagramInput = z.infer<typeof updateDiagramSchema>;
 
-export interface Diagram {
-	id: string;
-	name: string;
-	code: string;
-	createdAt: unknown;
-	updatedAt: unknown;
-}
+export type { Diagram } from '@/types/interfaces/diagram';

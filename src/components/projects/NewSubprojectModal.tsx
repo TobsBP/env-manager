@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { AuthResult } from '@/types/auth';
+import type { NewSubprojectModalProps } from '@/types/interfaces/modals';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 
-interface Props {
-	onClose: () => void;
-	onCreate: (name: string, emoji: string) => Promise<AuthResult>;
-}
-
-export function NewSubprojectModal({ onClose, onCreate }: Props) {
+export function NewSubprojectModal({
+	onClose,
+	onCreate,
+}: NewSubprojectModalProps) {
 	const [name, setName] = useState('');
 	const [emoji, setEmoji] = useState('📦');
 	const [isLoading, setIsLoading] = useState(false);

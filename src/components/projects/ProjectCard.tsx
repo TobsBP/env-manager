@@ -2,21 +2,10 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
-import type { MutationResult } from '@/types/auth';
-import type { Project } from '@/types/project';
+import type { ProjectCardProps } from '@/types/interfaces/cards';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 
-interface Props {
-	project: Project;
-	onUpdate: (
-		id: string,
-		name: string,
-		emoji: string,
-	) => Promise<MutationResult>;
-	onDelete: (id: string) => void;
-}
-
-export function ProjectCard({ project, onUpdate, onDelete }: Props) {
+export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(project.name);
 	const [emoji, setEmoji] = useState(project.emoji ?? '📁');

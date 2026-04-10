@@ -32,30 +32,11 @@ export const createEnvironmentSchema = z.object({
 export type CreateProjectInput = z.infer<typeof createProjectSchema>;
 export type CreateEnvironmentInput = z.infer<typeof createEnvironmentSchema>;
 
-export interface Project {
-	id: string;
-	name: string;
-	emoji: string;
-	userId: string;
-	createdAt: unknown;
-	projectType?: ProjectType;
-}
-
-export interface Subproject {
-	id: string;
-	name: string;
-	emoji: string;
-	createdAt: unknown;
-}
-
-export interface Environment {
-	id: string;
-	name: string;
-	createdAt: unknown;
-	easypanelUrl?: string;
-	easypanelToken?: string;
-	easypanelServiceName?: string;
-}
+export type {
+	Environment,
+	Project,
+	Subproject,
+} from '@/types/interfaces/project';
 
 export const createSubprojectSchema = z.object({
 	name: z

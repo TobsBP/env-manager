@@ -1,13 +1,9 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import type { MutationResult } from '@/types/auth';
+import type { AddVariableFormProps } from '@/types/interfaces/components';
 
 type Mode = 'single' | 'paste' | 'upload';
-
-interface Props {
-	onCreate: (key: string, value: string) => Promise<MutationResult>;
-}
 
 function parseEnvText(text: string): Array<{ key: string; value: string }> {
 	return text
@@ -26,7 +22,7 @@ function parseEnvText(text: string): Array<{ key: string; value: string }> {
 		});
 }
 
-export function AddVariableForm({ onCreate }: Props) {
+export function AddVariableForm({ onCreate }: AddVariableFormProps) {
 	const [mode, setMode] = useState<Mode>('single');
 
 	// Single mode
@@ -42,7 +38,7 @@ export function AddVariableForm({ onCreate }: Props) {
 	const [bulkSuccess, setBulkSuccess] = useState<string | null>(null);
 	const fileRef = useRef<HTMLInputElement>(null);
 
-	async function handleSingle(e: React.FormEvent) {
+	async function handleSingle(e: React.SyntheticEvent<HTMLFormElement>) {
 		e.preventDefault();
 		setSingleError(null);
 		setSingleLoading(true);
@@ -56,7 +52,7 @@ export function AddVariableForm({ onCreate }: Props) {
 		}
 	}
 
-	async function handleBulk(e: React.FormEvent) {
+	async function handleBulk(e: React.SyntheticEvent<HTMLFormElement>) {
 		e.preventDefault();
 		setBulkError(null);
 		setBulkSuccess(null);

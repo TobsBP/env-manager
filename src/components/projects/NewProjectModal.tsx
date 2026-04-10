@@ -1,28 +1,19 @@
 'use client';
 
 import { useState } from 'react';
-import type { AuthResult } from '@/types/auth';
+import type { NewProjectModalProps } from '@/types/interfaces/modals';
 import type { ProjectType } from '@/types/project';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 import { PROJECT_TYPES } from '@/utils/consts/project';
 
-interface Props {
-	onClose: () => void;
-	onCreate: (
-		name: string,
-		emoji: string,
-		projectType: ProjectType,
-	) => Promise<AuthResult>;
-}
-
-export function NewProjectModal({ onClose, onCreate }: Props) {
+export function NewProjectModal({ onClose, onCreate }: NewProjectModalProps) {
 	const [name, setName] = useState('');
 	const [emoji, setEmoji] = useState('📁');
 	const [projectType, setProjectType] = useState<ProjectType>('single');
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
-	async function handleSubmit(e: React.FormEvent) {
+	async function handleSubmit(e: React.SyntheticEvent<HTMLFormElement>) {
 		e.preventDefault();
 		const trimmed = name.trim();
 		if (!trimmed) return;

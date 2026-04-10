@@ -1,15 +1,13 @@
 'use client';
 
 import { useState } from 'react';
-import type { AuthResult } from '@/types/auth';
+import type { CloneEnvironmentModalProps } from '@/types/interfaces/modals';
 
-interface Props {
-	envName: string;
-	onClose: () => void;
-	onClone: (newName: string) => Promise<AuthResult>;
-}
-
-export function CloneEnvironmentModal({ envName, onClose, onClone }: Props) {
+export function CloneEnvironmentModal({
+	envName,
+	onClose,
+	onClone,
+}: CloneEnvironmentModalProps) {
 	const [name, setName] = useState(`Copy of ${envName}`);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
