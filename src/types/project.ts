@@ -1,11 +1,15 @@
 import { z } from 'zod';
 
+export const projectTypeSchema = z.enum(['single', 'subprojects', 'both']);
+export type ProjectType = z.infer<typeof projectTypeSchema>;
+
 export const createProjectSchema = z.object({
 	name: z
 		.string()
 		.min(1, 'Project name is required')
 		.max(50, 'Project name too long'),
 	emoji: z.string().default('📁'),
+	projectType: projectTypeSchema.default('single'),
 });
 
 export const updateProjectSchema = z.object({
@@ -34,6 +38,7 @@ export interface Project {
 	emoji: string;
 	userId: string;
 	createdAt: unknown;
+	projectType?: ProjectType;
 }
 
 export interface Subproject {

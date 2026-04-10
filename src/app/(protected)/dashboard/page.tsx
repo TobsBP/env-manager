@@ -156,7 +156,9 @@ export default function DashboardPage() {
 			{showModal && (
 				<NewProjectModal
 					onClose={() => setShowModal(false)}
-					onCreate={(name, emoji) => createProject(name, emoji)}
+					onCreate={(name, emoji, projectType) =>
+						createProject(name, emoji, projectType)
+					}
 				/>
 			)}
 		</div>

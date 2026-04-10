@@ -97,153 +97,94 @@ export default function ProjectPage({ params }: Props) {
 					<span className="text-zinc-300">Environments</span>
 				</div>
 
-				<div className="mb-8 flex items-start justify-between">
-					<div>
-						<div className="flex items-center gap-3 mb-1">
-							<h1 className="text-3xl font-semibold tracking-tight">
-								{project ? (
-									<>
-										<span className="text-zinc-500">
-											{project.emoji} {project.name}
-										</span>
-										<span className="text-zinc-700 mx-2">/</span>
-										Environments
-									</>
-								) : (
-									'Environments'
+				{(project?.projectType === 'single' ||
+					project?.projectType === 'both' ||
+					project?.projectType === undefined) && (
+					<div className="mb-8 flex items-start justify-between">
+						<div>
+							<div className="flex items-center gap-3 mb-1">
+								<h1 className="text-3xl font-semibold tracking-tight">
+									{project ? (
+										<>
+											<span className="text-zinc-500">
+												{project.emoji} {project.name}
+											</span>
+											<span className="text-zinc-700 mx-2">/</span>
+											Environments
+										</>
+									) : (
+										'Environments'
+									)}
+								</h1>
+								{!isLoading && environments.length > 0 && (
+									<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
+										{environments.length}
+									</span>
 								)}
-							</h1>
-							{!isLoading && environments.length > 0 && (
-								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
-									{environments.length}
-								</span>
-							)}
+							</div>
+							<p className="text-zinc-500">
+								Manage the environments for this project.
+							</p>
 						</div>
-						<p className="text-zinc-500">
-							Manage the environments for this project.
-						</p>
-					</div>
-					<div className="flex items-center gap-2">
-						<Link
-							href={`/projects/${projectId}/diagrams`}
-							className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								aria-hidden="true"
+						<div className="flex items-center gap-2">
+							<Link
+								href={`/projects/${projectId}/diagrams`}
+								className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50"
 							>
-								<rect x="3" y="3" width="18" height="18" rx="2" />
-								<path d="M3 9h18M9 21V9" />
-							</svg>
-							Diagrams
-						</Link>
-						<Link
-							href={`/projects/${projectId}/diff`}
-							className={`flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 ${environments.length < 2 ? 'pointer-events-none opacity-40' : ''}`}
-							aria-disabled={environments.length < 2}
-						>
-							<svg
-								width="14"
-								height="14"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								aria-hidden="true"
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									aria-hidden="true"
+								>
+									<rect x="3" y="3" width="18" height="18" rx="2" />
+									<path d="M3 9h18M9 21V9" />
+								</svg>
+								Diagrams
+							</Link>
+							<Link
+								href={`/projects/${projectId}/diff`}
+								className={`flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-zinc-500 hover:text-zinc-200 hover:bg-zinc-800/50 ${environments.length < 2 ? 'pointer-events-none opacity-40' : ''}`}
+								aria-disabled={environments.length < 2}
 							>
-								<path d="M18 20V10" />
-								<path d="M12 20V4" />
-								<path d="M6 20v-6" />
-							</svg>
-							Compare
-						</Link>
-						<button
-							type="button"
-							onClick={() => setShowModal(true)}
-							className="btn-primary flex items-center gap-2 w-fit! h-9 px-4 text-sm"
-						>
-							<span className="text-base leading-none">+</span>
-							New Environment
-						</button>
-					</div>
-				</div>
-
-				{isLoading ? (
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						{[1, 2].map((n) => (
-							<div
-								key={n}
-								className="glass-card h-18 animate-pulse bg-white/2"
-							/>
-						))}
-					</div>
-				) : environments.length === 0 ? (
-					<div className="glass-card px-6 py-16 text-center">
-						<div className="w-14 h-14 rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20 flex items-center justify-center text-2xl mx-auto mb-4">
-							🌍
-						</div>
-						<p className="text-base font-medium text-zinc-200 mb-1">
-							No environments yet
-						</p>
-						<p className="text-sm text-zinc-500">
-							Click{' '}
+								<svg
+									width="14"
+									height="14"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+									aria-hidden="true"
+								>
+									<path d="M18 20V10" />
+									<path d="M12 20V4" />
+									<path d="M6 20v-6" />
+								</svg>
+								Compare
+							</Link>
 							<button
 								type="button"
 								onClick={() => setShowModal(true)}
-								className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors"
+								className="btn-primary flex items-center gap-2 w-fit! h-9 px-4 text-sm"
 							>
+								<span className="text-base leading-none">+</span>
 								New Environment
-							</button>{' '}
-							to add prod, dev, or staging.
-						</p>
-					</div>
-				) : (
-					<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-						{environments.map((env) => (
-							<EnvironmentCard
-								key={env.id}
-								environment={env}
-								projectId={projectId}
-								onDelete={deleteEnvironment}
-								onClone={setCloneTarget}
-							/>
-						))}
+							</button>
+						</div>
 					</div>
 				)}
 
-				{/* Subprojects section */}
-				<div className="mt-12">
-					<div className="mb-5 flex items-center justify-between">
-						<div className="flex items-center gap-3">
-							<h2 className="text-xl font-semibold tracking-tight text-zinc-200">
-								Subprojects
-							</h2>
-							{!subprojectsLoading && subprojects.length > 0 && (
-								<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
-									{subprojects.length}
-								</span>
-							)}
-						</div>
-						<button
-							type="button"
-							onClick={() => setShowSubprojectModal(true)}
-							className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-violet-500/50 hover:text-violet-300 hover:bg-violet-500/5"
-						>
-							<span className="text-base leading-none">+</span>
-							New Subproject
-						</button>
-					</div>
-
-					{subprojectsLoading ? (
+				{(project?.projectType === 'single' ||
+					project?.projectType === 'both' ||
+					project?.projectType === undefined) &&
+					(isLoading ? (
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
 							{[1, 2].map((n) => (
 								<div
@@ -252,35 +193,105 @@ export default function ProjectPage({ params }: Props) {
 								/>
 							))}
 						</div>
-					) : subprojects.length === 0 ? (
-						<div className="glass-card px-6 py-10 text-center border-dashed">
-							<div className="w-12 h-12 rounded-2xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center text-xl mx-auto mb-3">
-								📦
+					) : environments.length === 0 ? (
+						<div className="glass-card px-6 py-16 text-center">
+							<div className="w-14 h-14 rounded-2xl bg-violet-500/10 ring-1 ring-violet-500/20 flex items-center justify-center text-2xl mx-auto mb-4">
+								🌍
 							</div>
-							<p className="text-sm font-medium text-zinc-400 mb-1">
-								No subprojects yet
+							<p className="text-base font-medium text-zinc-200 mb-1">
+								No environments yet
 							</p>
-							<p className="text-xs text-zinc-600">
-								Break this project into services like Backend, Frontend,
-								Worker...
+							<p className="text-sm text-zinc-500">
+								Click{' '}
+								<button
+									type="button"
+									onClick={() => setShowModal(true)}
+									className="text-violet-400 hover:text-violet-300 underline underline-offset-2 transition-colors"
+								>
+									New Environment
+								</button>{' '}
+								to add prod, dev, or staging.
 							</p>
 						</div>
 					) : (
 						<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-							{subprojects.map((sub) => (
-								<SubprojectCard
-									key={sub.id}
-									subproject={sub}
+							{environments.map((env) => (
+								<EnvironmentCard
+									key={env.id}
+									environment={env}
 									projectId={projectId}
-									onUpdate={(id, name, emoji) =>
-										updateSubproject(id, name, emoji)
-									}
-									onDelete={deleteSubproject}
+									onDelete={deleteEnvironment}
+									onClone={setCloneTarget}
 								/>
 							))}
 						</div>
-					)}
-				</div>
+					))}
+
+				{/* Subprojects section */}
+				{(project?.projectType === 'subprojects' ||
+					project?.projectType === 'both' ||
+					project?.projectType === undefined) && (
+					<div className="mt-12">
+						<div className="mb-5 flex items-center justify-between">
+							<div className="flex items-center gap-3">
+								<h2 className="text-xl font-semibold tracking-tight text-zinc-200">
+									Subprojects
+								</h2>
+								{!subprojectsLoading && subprojects.length > 0 && (
+									<span className="px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25 text-xs font-medium text-violet-300">
+										{subprojects.length}
+									</span>
+								)}
+							</div>
+							<button
+								type="button"
+								onClick={() => setShowSubprojectModal(true)}
+								className="flex items-center gap-2 h-9 px-4 text-sm rounded-lg border border-zinc-700/80 text-zinc-400 transition-all hover:border-violet-500/50 hover:text-violet-300 hover:bg-violet-500/5"
+							>
+								<span className="text-base leading-none">+</span>
+								New Subproject
+							</button>
+						</div>
+
+						{subprojectsLoading ? (
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								{[1, 2].map((n) => (
+									<div
+										key={n}
+										className="glass-card h-18 animate-pulse bg-white/2"
+									/>
+								))}
+							</div>
+						) : subprojects.length === 0 ? (
+							<div className="glass-card px-6 py-10 text-center border-dashed">
+								<div className="w-12 h-12 rounded-2xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center text-xl mx-auto mb-3">
+									📦
+								</div>
+								<p className="text-sm font-medium text-zinc-400 mb-1">
+									No subprojects yet
+								</p>
+								<p className="text-xs text-zinc-600">
+									Break this project into services like Backend, Frontend,
+									Worker...
+								</p>
+							</div>
+						) : (
+							<div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+								{subprojects.map((sub) => (
+									<SubprojectCard
+										key={sub.id}
+										subproject={sub}
+										projectId={projectId}
+										onUpdate={(id, name, emoji) =>
+											updateSubproject(id, name, emoji)
+										}
+										onDelete={deleteSubproject}
+									/>
+								))}
+							</div>
+						)}
+					</div>
+				)}
 			</main>
 
 			{showModal && (

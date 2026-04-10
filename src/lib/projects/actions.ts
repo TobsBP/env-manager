@@ -34,6 +34,7 @@ export async function createProjectAction(input: unknown): Promise<AuthResult> {
 	await db.collection('projects').add({
 		name: result.data.name,
 		emoji: result.data.emoji,
+		projectType: result.data.projectType,
 		userId: user.uid,
 		createdAt: FieldValue.serverTimestamp(),
 	});

@@ -10,7 +10,7 @@ import {
 	updateProjectAction,
 } from '@/lib/projects/actions';
 import type { AuthResult } from '@/types/auth';
-import type { Project } from '@/types/project';
+import type { Project, ProjectType } from '@/types/project';
 
 export function useProjects() {
 	const { user } = useUser();
@@ -59,7 +59,11 @@ export function useProjects() {
 	}, [user]);
 
 	const createProject = useCallback(
-		async (name: string, emoji = '📁'): Promise<AuthResult> => {
+		async (
+			name: string,
+			emoji = '📁',
+			projectType: ProjectType = 'single',
+		): Promise<AuthResult> => {
 			const tempId = `temp-${Date.now()}`;
 			const tempProject: Project = {
 				id: tempId,
@@ -67,10 +71,11 @@ export function useProjects() {
 				emoji,
 				userId: user?.uid ?? '',
 				createdAt: null,
+				projectType,
 			};
 			setProjects((prev) => [tempProject, ...prev]);
 
-			const result = await createProjectAction({ name, emoji });
+			const result = await createProjectAction({ name, emoji, projectType });
 			if (!result.success) {
 				setProjects((prev) => prev.filter((p) => p.id !== tempId));
 				setError(result.error);

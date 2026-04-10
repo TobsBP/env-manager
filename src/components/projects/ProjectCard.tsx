@@ -48,6 +48,7 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 	const [showPicker, setShowPicker] = useState(false);
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [confirmDelete, setConfirmDelete] = useState(false);
 
 	function startEdit(e: React.MouseEvent) {
 		e.preventDefault();
@@ -179,52 +180,74 @@ export function ProjectCard({ project, onUpdate, onDelete }: Props) {
 				</div>
 			</Link>
 			<div className="flex items-center gap-0.5 shrink-0">
-				<button
-					type="button"
-					onClick={startEdit}
-					className="p-2 text-zinc-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all cursor-pointer"
-					aria-label="Rename project"
-					title="Rename"
-				>
-					<svg
-						width="13"
-						height="13"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						aria-hidden="true"
-					>
-						<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-						<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-					</svg>
-				</button>
-				<button
-					type="button"
-					onClick={() => onDelete(project.id)}
-					className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
-					aria-label="Delete project"
-					title="Delete"
-				>
-					<svg
-						width="13"
-						height="13"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-						aria-hidden="true"
-					>
-						<polyline points="3 6 5 6 21 6" />
-						<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-						<path d="M10 11v6M14 11v6" />
-						<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-					</svg>
-				</button>
+				{confirmDelete ? (
+					<div className="flex items-center gap-1 pl-1">
+						<span className="text-xs text-zinc-400 mr-1">Deletar?</span>
+						<button
+							type="button"
+							onClick={() => onDelete(project.id)}
+							className="px-2 py-1 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-md transition-all"
+						>
+							Sim
+						</button>
+						<button
+							type="button"
+							onClick={() => setConfirmDelete(false)}
+							className="px-2 py-1 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50 rounded-md transition-all"
+						>
+							Não
+						</button>
+					</div>
+				) : (
+					<>
+						<button
+							type="button"
+							onClick={startEdit}
+							className="p-2 text-zinc-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all cursor-pointer"
+							aria-label="Rename project"
+							title="Rename"
+						>
+							<svg
+								width="13"
+								height="13"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+							</svg>
+						</button>
+						<button
+							type="button"
+							onClick={() => setConfirmDelete(true)}
+							className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
+							aria-label="Delete project"
+							title="Delete"
+						>
+							<svg
+								width="13"
+								height="13"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								strokeWidth="2"
+								strokeLinecap="round"
+								strokeLinejoin="round"
+								aria-hidden="true"
+							>
+								<polyline points="3 6 5 6 21 6" />
+								<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+								<path d="M10 11v6M14 11v6" />
+								<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+							</svg>
+						</button>
+					</>
+				)}
 				<Link
 					href={`/projects/${project.id}`}
 					className="p-2 text-zinc-700 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all"

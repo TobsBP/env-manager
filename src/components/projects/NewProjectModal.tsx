@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import type { AuthResult } from '@/types/auth';
+import type { ProjectType } from '@/types/project';
 
 const EMOJI_OPTIONS = [
 	'📁',
@@ -30,14 +31,46 @@ const EMOJI_OPTIONS = [
 	'🏗️',
 ];
 
+const PROJECT_TYPES: {
+	value: ProjectType;
+	label: string;
+	description: string;
+	icon: string;
+}[] = [
+	{
+		value: 'single',
+		label: 'Único',
+		description: 'Um projeto com ambientes diretos, sem divisões.',
+		icon: '📄',
+	},
+	{
+		value: 'subprojects',
+		label: 'Subprojetos',
+		description:
+			'Organize o projeto em serviços como Backend, Frontend, Worker…',
+		icon: '📦',
+	},
+	{
+		value: 'both',
+		label: 'Ambos',
+		description: 'Ambientes diretos e subprojetos no mesmo projeto.',
+		icon: '🗂️',
+	},
+];
+
 interface Props {
 	onClose: () => void;
-	onCreate: (name: string, emoji: string) => Promise<AuthResult>;
+	onCreate: (
+		name: string,
+		emoji: string,
+		projectType: ProjectType,
+	) => Promise<AuthResult>;
 }
 
 export function NewProjectModal({ onClose, onCreate }: Props) {
 	const [name, setName] = useState('');
 	const [emoji, setEmoji] = useState('📁');
+	const [projectType, setProjectType] = useState<ProjectType>('single');
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +82,7 @@ export function NewProjectModal({ onClose, onCreate }: Props) {
 		setIsLoading(true);
 		setError(null);
 
-		const result = await onCreate(trimmed, emoji);
+		const result = await onCreate(trimmed, emoji, projectType);
 		setIsLoading(false);
 
 		if (result.success) {
@@ -102,6 +135,31 @@ export function NewProjectModal({ onClose, onCreate }: Props) {
 						onChange={(e) => setName(e.target.value)}
 						disabled={isLoading}
 					/>
+
+					{/* Project type selector */}
+					<div>
+						<p className="text-xs text-zinc-500 mb-2">Tipo de projeto</p>
+						<div className="grid grid-cols-3 gap-2">
+							{PROJECT_TYPES.map((type) => (
+								<button
+									key={type.value}
+									type="button"
+									onClick={() => setProjectType(type.value)}
+									className={`flex flex-col items-center gap-1.5 rounded-lg border px-3 py-3 text-center transition-colors ${
+										projectType === type.value
+											? 'border-violet-500 bg-violet-500/10 text-zinc-100'
+											: 'border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-zinc-200'
+									}`}
+								>
+									<span className="text-xl">{type.icon}</span>
+									<span className="text-xs font-medium">{type.label}</span>
+									<span className="text-[10px] leading-tight text-zinc-500 hidden sm:block">
+										{type.description}
+									</span>
+								</button>
+							))}
+						</div>
+					</div>
 
 					{error && <p className="text-sm text-red-400">{error}</p>}
 
