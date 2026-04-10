@@ -2,8 +2,7 @@
 
 import { useState } from 'react';
 import type { AuthResult } from '@/types/auth';
-
-const PRESET_ENVS = ['prod', 'dev', 'homolog'];
+import { PRESET_ENVS } from '@/utils/consts/env';
 
 interface Props {
 	onClose: () => void;

@@ -1,14 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import type { MutationResult } from '@/types/auth';
 
 type Mode = 'single' | 'paste' | 'upload';
 
 interface Props {
-	onCreate: (
-		key: string,
-		value: string,
-	) => Promise<{ success: boolean; error?: string }>;
+	onCreate: (key: string, value: string) => Promise<MutationResult>;
 }
 
 function parseEnvText(text: string): Array<{ key: string; value: string }> {

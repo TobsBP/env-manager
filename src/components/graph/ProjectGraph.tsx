@@ -16,16 +16,12 @@ import { useCallback, useEffect, useMemo } from 'react';
 import '@xyflow/react/dist/style.css';
 import { useAllEnvironments } from '@/hooks/useAllEnvironments';
 import { useConnections } from '@/hooks/useConnections';
+import { COL_WIDTH, COLS, ROW_HEIGHT, STORAGE_KEY } from '@/utils/consts/graph';
 import { DeleteEdge } from './DeleteEdge';
 import { ProjectNode } from './ProjectNode';
 
 const nodeTypes = { projectNode: ProjectNode };
 const edgeTypes = { deleteEdge: DeleteEdge };
-
-const COLS = 3;
-const COL_WIDTH = 240;
-const ROW_HEIGHT = 130;
-const STORAGE_KEY = 'graph:node-positions';
 
 function loadPositions(): Record<string, { x: number; y: number }> {
 	try {

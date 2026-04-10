@@ -3,60 +3,8 @@
 import { useState } from 'react';
 import type { AuthResult } from '@/types/auth';
 import type { ProjectType } from '@/types/project';
-
-const EMOJI_OPTIONS = [
-	'📁',
-	'🚀',
-	'🌐',
-	'🔧',
-	'💻',
-	'📱',
-	'🎯',
-	'⚡',
-	'🔌',
-	'🗄️',
-	'🎨',
-	'📊',
-	'🔐',
-	'🛠️',
-	'📦',
-	'🧪',
-	'🌍',
-	'🔑',
-	'🤖',
-	'🧩',
-	'🛡️',
-	'🔭',
-	'🎮',
-	'🏗️',
-];
-
-const PROJECT_TYPES: {
-	value: ProjectType;
-	label: string;
-	description: string;
-	icon: string;
-}[] = [
-	{
-		value: 'single',
-		label: 'Único',
-		description: 'Um projeto com ambientes diretos, sem divisões.',
-		icon: '📄',
-	},
-	{
-		value: 'subprojects',
-		label: 'Subprojetos',
-		description:
-			'Organize o projeto em serviços como Backend, Frontend, Worker…',
-		icon: '📦',
-	},
-	{
-		value: 'both',
-		label: 'Ambos',
-		description: 'Ambientes diretos e subprojetos no mesmo projeto.',
-		icon: '🗂️',
-	},
-];
+import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
+import { PROJECT_TYPES } from '@/utils/consts/project';
 
 interface Props {
 	onClose: () => void;

@@ -1,5 +1,5 @@
 export const EMOJI_OPTIONS = [
-	'📦',
+	'📁',
 	'🚀',
 	'🌐',
 	'🔧',
@@ -13,7 +13,7 @@ export const EMOJI_OPTIONS = [
 	'📊',
 	'🔐',
 	'🛠️',
-	'📁',
+	'📦',
 	'🧪',
 	'🌍',
 	'🔑',

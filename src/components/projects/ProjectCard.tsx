@@ -2,34 +2,9 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import type { MutationResult } from '@/types/auth';
 import type { Project } from '@/types/project';
-
-const EMOJI_OPTIONS = [
-	'📁',
-	'🚀',
-	'🌐',
-	'🔧',
-	'💻',
-	'📱',
-	'🎯',
-	'⚡',
-	'🔌',
-	'🗄️',
-	'🎨',
-	'📊',
-	'🔐',
-	'🛠️',
-	'📦',
-	'🧪',
-	'🌍',
-	'🔑',
-	'🤖',
-	'🧩',
-	'🛡️',
-	'🔭',
-	'🎮',
-	'🏗️',
-];
+import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 
 interface Props {
 	project: Project;
@@ -37,7 +12,7 @@ interface Props {
 		id: string,
 		name: string,
 		emoji: string,
-	) => Promise<{ success: boolean; error?: string }>;
+	) => Promise<MutationResult>;
 	onDelete: (id: string) => void;
 }
 

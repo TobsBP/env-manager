@@ -39,3 +39,5 @@ export const DEFAULT_ENV = {
 	dot: 'bg-zinc-400',
 	label: null,
 };
+
+export const PRESET_ENVS = ['prod', 'dev', 'homolog'];

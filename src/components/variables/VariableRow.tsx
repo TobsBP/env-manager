@@ -1,16 +1,13 @@
 'use client';
 
 import { useState } from 'react';
+import type { MutationResult } from '@/types/auth';
 import type { EnvVariable } from '@/types/variable';
 
 interface Props {
 	variable: EnvVariable;
-	onUpdate: (
-		id: string,
-		key: string,
-		value: string,
-	) => Promise<{ success: boolean; error?: string }>;
-	onDelete: (id: string) => Promise<{ success: boolean; error?: string }>;
+	onUpdate: (id: string, key: string, value: string) => Promise<MutationResult>;
+	onDelete: (id: string) => Promise<MutationResult>;
 }
 
 export function VariableRow({ variable, onUpdate, onDelete }: Props) {

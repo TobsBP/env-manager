@@ -29,6 +29,8 @@ export type AuthResult =
 	| { success: true; message?: string }
 	| { success: false; error: string };
 
+export type MutationResult = { success: boolean; error?: string };
+
 export interface SessionUser {
 	uid: string;
 	email: string | null;

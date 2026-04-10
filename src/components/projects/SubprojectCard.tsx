@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import type { MutationResult } from '@/types/auth';
 import type { Subproject } from '@/types/project';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 
@@ -12,7 +13,7 @@ interface Props {
 		id: string,
 		name: string,
 		emoji: string,
-	) => Promise<{ success: boolean; error?: string }>;
+	) => Promise<MutationResult>;
 	onDelete: (id: string) => void;
 }
 
