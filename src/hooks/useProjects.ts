@@ -1,7 +1,14 @@
 'use client';
 
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
-import { useCallback, useEffect, useState } from 'react';
+import {
+	collection,
+	doc,
+	getDoc,
+	onSnapshot,
+	query,
+	where,
+} from 'firebase/firestore';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useUser } from '@/hooks/useUser';
 import { db } from '@/lib/firebase/firestore';
 import {
@@ -10,53 +17,108 @@ import {
 	updateProjectAction,
 } from '@/lib/projects/actions';
 import type { AuthResult } from '@/types/auth';
+import type { ProjectRole } from '@/types/interfaces/project';
 import type { Project, ProjectType } from '@/types/project';
+
+export type ProjectWithRole = Project & { role: ProjectRole };
+
+function sortByCreatedAt(projects: ProjectWithRole[]): ProjectWithRole[] {
+	return [...projects].sort((a, b) => {
+		const ta =
+			(a.createdAt as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
+		const tb =
+			(b.createdAt as { toMillis?: () => number } | null)?.toMillis?.() ?? 0;
+		return tb - ta;
+	});
+}
 
 export function useProjects() {
 	const { user } = useUser();
-	const [projects, setProjects] = useState<Project[]>([]);
+	const [ownedProjects, setOwnedProjects] = useState<ProjectWithRole[]>([]);
+	const [sharedProjects, setSharedProjects] = useState<ProjectWithRole[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
 
+	const ownedLoaded = useRef(false);
+	const sharedLoaded = useRef(false);
+
 	useEffect(() => {
 		if (!user) {
-			setProjects([]);
+			setOwnedProjects([]);
+			setSharedProjects([]);
 			setIsLoading(false);
 			return;
 		}
 
-		const q = query(
-			collection(db, 'projects'),
-			where('userId', '==', user.uid),
-		);
+		ownedLoaded.current = false;
+		sharedLoaded.current = false;
+		setIsLoading(true);
 
-		const unsubscribe = onSnapshot(
-			q,
+		// Query A — projetos do owner
+		const unsubOwned = onSnapshot(
+			query(collection(db, 'projects'), where('userId', '==', user.uid)),
 			(snapshot) => {
-				const docs = snapshot.docs.map((doc) => ({
-					id: doc.id,
-					...doc.data(),
-				})) as Project[];
-				docs.sort((a, b) => {
-					const ta =
-						(a.createdAt as { toMillis?: () => number } | null)?.toMillis?.() ??
-						0;
-					const tb =
-						(b.createdAt as { toMillis?: () => number } | null)?.toMillis?.() ??
-						0;
-					return tb - ta;
-				});
-				setProjects(docs);
-				setIsLoading(false);
+				const docs = snapshot.docs.map((d) => ({
+					id: d.id,
+					...d.data(),
+					role: 'owner' as ProjectRole,
+				})) as ProjectWithRole[];
+				setOwnedProjects(docs);
+				ownedLoaded.current = true;
+				if (sharedLoaded.current) setIsLoading(false);
 			},
 			(err) => {
 				setError(err.message);
-				setIsLoading(false);
+				ownedLoaded.current = true;
+				if (sharedLoaded.current) setIsLoading(false);
 			},
 		);
 
-		return unsubscribe;
+		// Query B — projetos compartilhados
+		const unsubShared = onSnapshot(
+			query(
+				collection(db, 'projects'),
+				where('memberUids', 'array-contains', user.uid),
+			),
+			async (snapshot) => {
+				const uid = user.uid;
+				const withRoles = await Promise.all(
+					snapshot.docs.map(async (d) => {
+						try {
+							const memberSnap = await getDoc(
+								doc(db, 'projects', d.id, 'members', uid),
+							);
+							const role: ProjectRole = memberSnap.exists()
+								? (memberSnap.data()?.role as 'editor' | 'viewer')
+								: 'viewer';
+							return { id: d.id, ...d.data(), role } as ProjectWithRole;
+						} catch {
+							return {
+								id: d.id,
+								...d.data(),
+								role: 'viewer' as ProjectRole,
+							} as ProjectWithRole;
+						}
+					}),
+				);
+				setSharedProjects(withRoles);
+				sharedLoaded.current = true;
+				if (ownedLoaded.current) setIsLoading(false);
+			},
+			(err) => {
+				setError(err.message);
+				sharedLoaded.current = true;
+				if (ownedLoaded.current) setIsLoading(false);
+			},
+		);
+
+		return () => {
+			unsubOwned();
+			unsubShared();
+		};
 	}, [user]);
+
+	const projects = sortByCreatedAt([...ownedProjects, ...sharedProjects]);
 
 	const createProject = useCallback(
 		async (
@@ -65,19 +127,20 @@ export function useProjects() {
 			projectType: ProjectType = 'single',
 		): Promise<AuthResult> => {
 			const tempId = `temp-${Date.now()}`;
-			const tempProject: Project = {
+			const tempProject: ProjectWithRole = {
 				id: tempId,
 				name,
 				emoji,
 				userId: user?.uid ?? '',
 				createdAt: null,
 				projectType,
+				role: 'owner',
 			};
-			setProjects((prev) => [tempProject, ...prev]);
+			setOwnedProjects((prev) => [tempProject, ...prev]);
 
 			const result = await createProjectAction({ name, emoji, projectType });
 			if (!result.success) {
-				setProjects((prev) => prev.filter((p) => p.id !== tempId));
+				setOwnedProjects((prev) => prev.filter((p) => p.id !== tempId));
 				setError(result.error);
 			}
 			return result;
@@ -91,7 +154,7 @@ export function useProjects() {
 			name: string,
 			emoji: string,
 		): Promise<AuthResult> => {
-			setProjects((prev) =>
+			setOwnedProjects((prev) =>
 				prev.map((p) => (p.id === projectId ? { ...p, name, emoji } : p)),
 			);
 			const result = await updateProjectAction(projectId, { name, emoji });
@@ -103,11 +166,9 @@ export function useProjects() {
 
 	const deleteProject = useCallback(
 		async (projectId: string): Promise<AuthResult> => {
-			setProjects((prev) => prev.filter((p) => p.id !== projectId));
+			setOwnedProjects((prev) => prev.filter((p) => p.id !== projectId));
 			const result = await deleteProjectAction(projectId);
-			if (!result.success) {
-				setError(result.error);
-			}
+			if (!result.success) setError(result.error);
 			return result;
 		},
 		[],

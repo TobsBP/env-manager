@@ -1,5 +1,7 @@
 import type { ProjectType } from '@/types/project';
 
+export type ProjectRole = 'owner' | 'editor' | 'viewer';
+
 export interface Project {
 	id: string;
 	name: string;
@@ -7,6 +9,14 @@ export interface Project {
 	userId: string;
 	createdAt: unknown;
 	projectType?: ProjectType;
+	memberUids?: string[];
+}
+
+export interface ProjectMember {
+	uid: string;
+	email: string;
+	role: 'viewer' | 'editor';
+	addedAt: number | null;
 }
 
 export interface Subproject {

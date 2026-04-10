@@ -3,17 +3,20 @@ import type { Diagram } from '@/types/interfaces/diagram';
 import type {
 	Environment,
 	Project,
+	ProjectRole,
 	Subproject,
 } from '@/types/interfaces/project';
 
 export interface ProjectCardProps {
 	project: Project;
-	onUpdate: (
+	role?: ProjectRole;
+	onUpdate?: (
 		id: string,
 		name: string,
 		emoji: string,
 	) => Promise<MutationResult>;
-	onDelete: (id: string) => void;
+	onDelete?: (id: string) => void;
+	onShare?: () => void;
 }
 
 export interface SubprojectCardProps {

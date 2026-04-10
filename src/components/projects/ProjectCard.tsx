@@ -2,10 +2,17 @@
 
 import Link from 'next/link';
 import { useState } from 'react';
+import { ShareProjectModal } from '@/components/projects/ShareProjectModal';
 import type { ProjectCardProps } from '@/types/interfaces/cards';
 import { EMOJI_OPTIONS } from '@/utils/consts/emoji';
 
-export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
+export function ProjectCard({
+	project,
+	role,
+	onUpdate,
+	onDelete,
+	onShare,
+}: ProjectCardProps) {
 	const [editing, setEditing] = useState(false);
 	const [name, setName] = useState(project.name);
 	const [emoji, setEmoji] = useState(project.emoji ?? '📁');
@@ -13,6 +20,9 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 	const [isSaving, setIsSaving] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [confirmDelete, setConfirmDelete] = useState(false);
+	const [showShareModal, setShowShareModal] = useState(false);
+
+	const isOwner = role === 'owner' || role === undefined;
 
 	function startEdit(e: React.MouseEvent) {
 		e.preventDefault();
@@ -30,6 +40,7 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 	}
 
 	async function handleSave() {
+		if (!onUpdate) return;
 		const trimmed = name.trim();
 		if (!trimmed) {
 			cancelEdit();
@@ -61,7 +72,6 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 				{error && <p className="text-xs text-red-400">{error}</p>}
 
 				<div className="flex items-center gap-2">
-					{/* Emoji toggle button */}
 					<button
 						type="button"
 						onClick={() => setShowPicker((v) => !v)}
@@ -99,7 +109,6 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 					</button>
 				</div>
 
-				{/* Emoji picker */}
 				{showPicker && (
 					<div className="grid grid-cols-8 gap-1 pt-1 border-t border-white/5">
 						{EMOJI_OPTIONS.map((e) => (
@@ -126,112 +135,160 @@ export function ProjectCard({ project, onUpdate, onDelete }: ProjectCardProps) {
 	}
 
 	return (
-		<div className="glass-card flex items-center gap-2 px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
-			<Link
-				href={`/projects/${project.id}`}
-				className="flex items-center gap-4 flex-1 min-w-0"
-			>
-				<div className="w-10 h-10 rounded-xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center text-xl shrink-0 group-hover:ring-violet-500/20 transition-all">
-					{project.emoji ?? '📁'}
-				</div>
-				<div className="min-w-0 flex-1">
-					<p className="font-medium truncate group-hover:text-violet-300 transition-colors">
-						{project.name}
-					</p>
-					<p className="text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5">
-						Open project
-					</p>
-				</div>
-			</Link>
-			<div className="flex items-center gap-0.5 shrink-0">
-				{confirmDelete ? (
-					<div className="flex items-center gap-1 pl-1">
-						<span className="text-xs text-zinc-400 mr-1">Deletar?</span>
-						<button
-							type="button"
-							onClick={() => onDelete(project.id)}
-							className="px-2 py-1 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-md transition-all"
-						>
-							Sim
-						</button>
-						<button
-							type="button"
-							onClick={() => setConfirmDelete(false)}
-							className="px-2 py-1 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50 rounded-md transition-all"
-						>
-							Não
-						</button>
-					</div>
-				) : (
-					<>
-						<button
-							type="button"
-							onClick={startEdit}
-							className="p-2 text-zinc-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all cursor-pointer"
-							aria-label="Rename project"
-							title="Rename"
-						>
-							<svg
-								width="13"
-								height="13"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								aria-hidden="true"
-							>
-								<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
-								<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
-							</svg>
-						</button>
-						<button
-							type="button"
-							onClick={() => setConfirmDelete(true)}
-							className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
-							aria-label="Delete project"
-							title="Delete"
-						>
-							<svg
-								width="13"
-								height="13"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								strokeWidth="2"
-								strokeLinecap="round"
-								strokeLinejoin="round"
-								aria-hidden="true"
-							>
-								<polyline points="3 6 5 6 21 6" />
-								<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
-								<path d="M10 11v6M14 11v6" />
-								<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
-							</svg>
-						</button>
-					</>
-				)}
+		<>
+			<div className="glass-card flex items-center gap-2 px-5 py-4 group hover:border-violet-500/20 hover:shadow-[0_0_30px_rgba(139,92,246,0.06)]">
 				<Link
 					href={`/projects/${project.id}`}
-					className="p-2 text-zinc-700 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all"
-					aria-hidden="true"
-					tabIndex={-1}
+					className="flex items-center gap-4 flex-1 min-w-0"
 				>
-					<svg
-						width="14"
-						height="14"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						strokeWidth="2"
-						strokeLinecap="round"
-						strokeLinejoin="round"
-					>
-						<path d="M9 18l6-6-6-6" />
-					</svg>
+					<div className="w-10 h-10 rounded-xl bg-zinc-800/80 ring-1 ring-white/8 flex items-center justify-center text-xl shrink-0 group-hover:ring-violet-500/20 transition-all">
+						{project.emoji ?? '📁'}
+					</div>
+					<div className="min-w-0 flex-1">
+						<div className="flex items-center gap-2">
+							<p className="font-medium truncate group-hover:text-violet-300 transition-colors">
+								{project.name}
+							</p>
+							{(role === 'editor' || role === 'viewer') && (
+								<span className="shrink-0 px-1.5 py-0.5 rounded-full text-[10px] font-medium bg-zinc-700/60 text-zinc-400 border border-zinc-600/40">
+									{role === 'editor' ? 'Editor' : 'Viewer'}
+								</span>
+							)}
+						</div>
+						<p className="text-xs text-zinc-600 group-hover:text-zinc-500 transition-colors mt-0.5">
+							Open project
+						</p>
+					</div>
 				</Link>
+				<div className="flex items-center gap-0.5 shrink-0">
+					{confirmDelete ? (
+						<div className="flex items-center gap-1 pl-1">
+							<span className="text-xs text-zinc-400 mr-1">Deletar?</span>
+							<button
+								type="button"
+								onClick={() => onDelete?.(project.id)}
+								className="px-2 py-1 text-xs font-medium text-red-400 hover:text-red-300 bg-red-500/10 hover:bg-red-500/20 rounded-md transition-all"
+							>
+								Sim
+							</button>
+							<button
+								type="button"
+								onClick={() => setConfirmDelete(false)}
+								className="px-2 py-1 text-xs font-medium text-zinc-400 hover:text-zinc-200 hover:bg-zinc-700/50 rounded-md transition-all"
+							>
+								Não
+							</button>
+						</div>
+					) : (
+						<>
+							{isOwner && (
+								<button
+									type="button"
+									onClick={() => {
+										if (onShare) onShare();
+										else setShowShareModal(true);
+									}}
+									className="p-2 text-zinc-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all cursor-pointer"
+									aria-label="Share project"
+									title="Share"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" />
+										<polyline points="16 6 12 2 8 6" />
+										<line x1="12" y1="2" x2="12" y2="15" />
+									</svg>
+								</button>
+							)}
+							{onUpdate && (
+								<button
+									type="button"
+									onClick={startEdit}
+									className="p-2 text-zinc-500 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all cursor-pointer"
+									aria-label="Rename project"
+									title="Rename"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										aria-hidden="true"
+									>
+										<path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+										<path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+									</svg>
+								</button>
+							)}
+							{onDelete && (
+								<button
+									type="button"
+									onClick={() => setConfirmDelete(true)}
+									className="p-2 text-zinc-500 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all cursor-pointer"
+									aria-label="Delete project"
+									title="Delete"
+								>
+									<svg
+										width="13"
+										height="13"
+										viewBox="0 0 24 24"
+										fill="none"
+										stroke="currentColor"
+										strokeWidth="2"
+										strokeLinecap="round"
+										strokeLinejoin="round"
+										aria-hidden="true"
+									>
+										<polyline points="3 6 5 6 21 6" />
+										<path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" />
+										<path d="M10 11v6M14 11v6" />
+										<path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2" />
+									</svg>
+								</button>
+							)}
+						</>
+					)}
+					<Link
+						href={`/projects/${project.id}`}
+						className="p-2 text-zinc-700 group-hover:text-violet-400 group-hover:translate-x-0.5 transition-all"
+						aria-hidden="true"
+						tabIndex={-1}
+					>
+						<svg
+							width="14"
+							height="14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							strokeWidth="2"
+							strokeLinecap="round"
+							strokeLinejoin="round"
+						>
+							<path d="M9 18l6-6-6-6" />
+						</svg>
+					</Link>
+				</div>
 			</div>
-		</div>
+
+			{showShareModal && (
+				<ShareProjectModal
+					projectId={project.id}
+					onClose={() => setShowShareModal(false)}
+				/>
+			)}
+		</>
 	);
 }

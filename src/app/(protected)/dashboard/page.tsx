@@ -145,8 +145,9 @@ export default function DashboardPage() {
 							<ProjectCard
 								key={project.id}
 								project={project}
-								onUpdate={updateProject}
-								onDelete={deleteProject}
+								role={project.role}
+								onUpdate={project.role === 'owner' ? updateProject : undefined}
+								onDelete={project.role === 'owner' ? deleteProject : undefined}
 							/>
 						))}
 					</div>

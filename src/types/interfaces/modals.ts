@@ -33,3 +33,8 @@ export interface NewDiagramModalProps {
 	initialCode?: string;
 	mode?: 'create' | 'edit';
 }
+
+export interface ShareProjectModalProps {
+	projectId: string;
+	onClose: () => void;
+}

@@ -3,6 +3,7 @@
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { z } from 'zod';
 import { getAdminAuth, getSessionUser } from '@/lib/firebase/admin';
+import { getProjectAccess } from '@/lib/projects/access';
 import type { AuthResult } from '@/types/auth';
 import {
 	createEnvironmentSchema,
@@ -17,7 +18,6 @@ const easypanelConfigSchema = z.object({
 });
 
 function getAdminDb() {
-	// Ensure admin app is initialized via getAdminAuth, then get Firestore
 	getAdminAuth();
 	return getFirestore();
 }
@@ -36,6 +36,7 @@ export async function createProjectAction(input: unknown): Promise<AuthResult> {
 		emoji: result.data.emoji,
 		projectType: result.data.projectType,
 		userId: user.uid,
+		memberUids: [],
 		createdAt: FieldValue.serverTimestamp(),
 	});
 
@@ -54,14 +55,14 @@ export async function updateProjectAction(
 		return { success: false, error: result.error.issues[0].message };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (role !== 'owner') return { success: false, error: 'Unauthorized' };
 
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
-		return { success: false, error: 'Unauthorized' };
-
-	await projectRef.update({ name: result.data.name, emoji: result.data.emoji });
+	await db
+		.collection('projects')
+		.doc(projectId)
+		.update({ name: result.data.name, emoji: result.data.emoji });
 
 	return { success: true };
 }
@@ -73,15 +74,11 @@ export async function deleteProjectAction(
 	if (!user) return { success: false, error: 'Not authenticated' };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (role !== 'owner') return { success: false, error: 'Unauthorized' };
 
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
-		return { success: false, error: 'Unauthorized' };
-
-	// Delete all sub-collections would need recursive delete; for now delete the doc
-	await projectRef.delete();
+	await db.collection('projects').doc(projectId).delete();
 
 	return { success: true };
 }
@@ -98,17 +95,19 @@ export async function createEnvironmentAction(
 		return { success: false, error: result.error.issues[0].message };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
-
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (!role || role === 'viewer')
 		return { success: false, error: 'Unauthorized' };
 
-	await projectRef.collection('environments').add({
-		name: result.data.name,
-		createdAt: FieldValue.serverTimestamp(),
-	});
+	await db
+		.collection('projects')
+		.doc(projectId)
+		.collection('environments')
+		.add({
+			name: result.data.name,
+			createdAt: FieldValue.serverTimestamp(),
+		});
 
 	return { success: true };
 }
@@ -121,14 +120,17 @@ export async function deleteEnvironmentAction(
 	if (!user) return { success: false, error: 'Not authenticated' };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
-
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (!role || role === 'viewer')
 		return { success: false, error: 'Unauthorized' };
 
-	await projectRef.collection('environments').doc(envId).delete();
+	await db
+		.collection('projects')
+		.doc(projectId)
+		.collection('environments')
+		.doc(envId)
+		.delete();
 
 	return { success: true };
 }
@@ -142,16 +144,15 @@ export async function cloneEnvironmentAction(
 	if (!user) return { success: false, error: 'Not authenticated' };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
-
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (!role || role === 'viewer')
 		return { success: false, error: 'Unauthorized' };
 
 	const trimmed = newName.trim();
 	if (!trimmed) return { success: false, error: 'Name is required' };
 
+	const projectRef = db.collection('projects').doc(projectId);
 	const newEnvRef = await projectRef.collection('environments').add({
 		name: trimmed,
 		createdAt: FieldValue.serverTimestamp(),
@@ -192,14 +193,14 @@ export async function updateEnvironmentEasypanelAction(
 		return { success: false, error: result.error.issues[0].message };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
-
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (!role || role === 'viewer')
 		return { success: false, error: 'Unauthorized' };
 
-	await projectRef
+	await db
+		.collection('projects')
+		.doc(projectId)
 		.collection('environments')
 		.doc(envId)
 		.update({
@@ -219,14 +220,16 @@ export async function deployToEasypanelAction(
 	if (!user) return { success: false, error: 'Not authenticated' };
 
 	const db = getAdminDb();
-	const projectRef = db.collection('projects').doc(projectId);
-	const project = await projectRef.get();
-
-	if (!project.exists) return { success: false, error: 'Project not found' };
-	if (project.data()?.userId !== user.uid)
+	const { project, role } = await getProjectAccess(db, projectId, user.uid);
+	if (!project) return { success: false, error: 'Project not found' };
+	if (!role || role === 'viewer')
 		return { success: false, error: 'Unauthorized' };
 
-	const envRef = projectRef.collection('environments').doc(envId);
+	const envRef = db
+		.collection('projects')
+		.doc(projectId)
+		.collection('environments')
+		.doc(envId);
 	const env = await envRef.get();
 	if (!env.exists) return { success: false, error: 'Environment not found' };
 
